@@ -45,17 +45,15 @@ Flow auto-runs: **Lobby → Make Dad → Mini 1 → Baby showcase → Mini 2 →
 
 | Piece | Status |
 |-------|--------|
-| Hub stage (desk, curtains, eyes, spotlights, VHS overlay) | Works (procedural) |
-| CPU Host wah + text cards | Works |
-| Local lobby stub (4 seats, room code) | Works — not Steam yet |
-| Make Dad seed pack | Works (stub art) |
-| Pissing Contest | Playable |
-| Backyard BBQ Brawl | Playable (soft physics) |
-| Camera cuts (orbit / push / whip / eyes) | Works (custom director; Cinemachine package present for later) |
-| AI baby | **Mock** funny placeholders that change each win |
-| Bowling-alley showcase | Works (lights, roll-out, animatronic idle) |
-| Stars + crown | Works |
-| Steam lobbies / real mesh API / selfie | Stubbed / deferred |
+| Hub stage (3D desk/curtains/spots/eyes) | Works — `StageKit` mesh blockout |
+| CPU Host | Works — modeled primitive kit + idle/talk |
+| Dad avatars | Works — 6 creature 3D kits |
+| Local lobby stub | Works — not Steam yet |
+| Make Dad seed pack | Works |
+| Pissing Contest / BBQ Brawl | Playable 3D arenas + kit bodies |
+| Baby showcase | 3D lane/cradle/emissive chase + mock baby mesh |
+| AI baby API | Mock gens (change each win) |
+| Steam lobbies / selfie / final art | Stubbed / deferred |
 
 ## Design source of truth
 
