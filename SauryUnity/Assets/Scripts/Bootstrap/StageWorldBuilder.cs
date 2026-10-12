@@ -11,134 +11,83 @@ using UnityEngine.UI;
 
 namespace Saury.Bootstrap
 {
-    /// <summary>Procedural Maury hub stage — opens without hand-authored scene content.</summary>
+    /// <summary>Procedural Maury hub — real 3D set + character kits.</summary>
     public static class StageWorldBuilder
     {
         public static GameFlowController Build()
         {
             var root = new GameObject("SauryWorld").transform;
 
-            // Lighting — dingy stage
             RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
-            RenderSettings.ambientLight = new Color(0.08f, 0.07f, 0.09f);
-            var sun = new GameObject("KeySpot");
-            sun.transform.SetParent(root, false);
-            sun.transform.position = new Vector3(1.5f, 5.5f, -2f);
-            sun.transform.rotation = Quaternion.Euler(50f, -30f, 0f);
-            var key = sun.AddComponent<Light>();
-            key.type = LightType.Spot;
-            key.range = 20f;
-            key.spotAngle = 55f;
-            key.intensity = 3.2f;
-            key.color = new Color(1f, 0.92f, 0.75f);
+            RenderSettings.ambientLight = new Color(0.05f, 0.045f, 0.055f);
+            RenderSettings.fog = true;
+            RenderSettings.fogColor = new Color(0.02f, 0.02f, 0.03f);
+            RenderSettings.fogDensity = 0.035f;
 
-            var fill = new GameObject("Fill");
-            fill.transform.SetParent(root, false);
-            fill.transform.position = new Vector3(-3f, 3f, 2f);
-            var fillL = fill.AddComponent<Light>();
-            fillL.type = LightType.Point;
-            fillL.range = 12f;
-            fillL.intensity = 0.6f;
-            fillL.color = new Color(0.45f, 0.5f, 0.7f);
+            StageKit.BuildHubSet(root);
 
-            // Floor + curtains
-            var floor = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            floor.name = "StageFloor";
-            floor.transform.SetParent(root, false);
-            floor.transform.localScale = new Vector3(16f, 0.2f, 12f);
-            floor.transform.position = new Vector3(0f, -0.1f, 0f);
-            PrimitiveMaterials.Apply(floor, new Color(0.12f, 0.1f, 0.11f));
+            // CPU Host — modeled figure at desk
+            var hostBuild = CharacterKit.BuildHost(root, new Vector3(0f, 0.95f, 2.35f));
 
-            var back = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            back.name = "NicotineCurtain";
-            back.transform.SetParent(root, false);
-            back.transform.position = new Vector3(0f, 2.5f, 5.5f);
-            back.transform.localScale = new Vector3(14f, 5f, 0.2f);
-            PrimitiveMaterials.Apply(back, new Color(0.35f, 0.22f, 0.14f));
-
-            // Host desk + figure
-            var desk = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            desk.name = "HostDesk";
-            desk.transform.SetParent(root, false);
-            desk.transform.position = new Vector3(0f, 0.55f, 2.2f);
-            desk.transform.localScale = new Vector3(2.4f, 1.1f, 1f);
-            PrimitiveMaterials.Apply(desk, new Color(0.25f, 0.18f, 0.12f));
-
-            var hostGo = new GameObject("CPU_Host");
-            hostGo.transform.SetParent(root, false);
-            hostGo.transform.position = new Vector3(0f, 1.55f, 2.5f);
-            var torso = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-            torso.transform.SetParent(hostGo.transform, false);
-            torso.transform.localScale = new Vector3(0.7f, 0.7f, 0.5f);
-            PrimitiveMaterials.Apply(torso, new Color(0.55f, 0.2f, 0.22f));
-            Object.Destroy(torso.GetComponent<Collider>());
-
-            var head = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            head.transform.SetParent(hostGo.transform, false);
-            head.transform.localPosition = new Vector3(0f, 0.85f, 0f);
-            head.transform.localScale = Vector3.one * 0.55f;
-            PrimitiveMaterials.Apply(head, new Color(0.85f, 0.72f, 0.62f));
-            Object.Destroy(head.GetComponent<Collider>());
-
-            var mouth = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            mouth.name = "Mouth";
-            mouth.transform.SetParent(head.transform, false);
-            mouth.transform.localPosition = new Vector3(0f, -0.15f, 0.28f);
-            mouth.transform.localScale = new Vector3(0.35f, 0.12f, 0.1f);
-            PrimitiveMaterials.Apply(mouth, new Color(0.4f, 0.1f, 0.12f));
-            Object.Destroy(mouth.GetComponent<Collider>());
-
-            // Audience eyes
+            // Audience eyes (3D pairs)
             var eyesRoot = new GameObject("AudienceEyes").transform;
             eyesRoot.SetParent(root, false);
-            var eyes = eyesRoot.gameObject.AddComponent<AudienceEyes>();
-            eyes.Build(eyesRoot, 18);
+            eyesRoot.gameObject.AddComponent<AudienceEyes>().Build(eyesRoot, 16);
 
-            // Marks / dad stools
+            // Hub dad dolls on stools (readable creature blockouts)
             for (int i = 0; i < 4; i++)
             {
-                var stool = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                stool.name = $"DadMark_{i}";
-                stool.transform.SetParent(root, false);
-                stool.transform.position = new Vector3(-2.4f + i * 1.6f, 0.35f, -1.2f);
-                stool.transform.localScale = new Vector3(0.6f, 0.35f, 0.6f);
-                PrimitiveMaterials.Apply(stool, new Color(0.2f, 0.2f, 0.22f));
+                var creature = (CreatureId)(i % 6);
+                var dad = CharacterKit.BuildDad(
+                    root,
+                    new Vector3(-2.6f + i * 1.7f, 0.45f, -1.4f),
+                    creature,
+                    name: $"HubDad_{creature}");
+                dad.root.transform.localScale = Vector3.one * 0.85f;
+                // Hub dolls are scenic — freeze physics
+                var rb = dad.root.AddComponent<Rigidbody>();
+                rb.isKinematic = true;
+                rb.useGravity = false;
             }
 
-            // Camera + mounts
+            // Camera
             var camGo = new GameObject("MainShowCamera");
             camGo.transform.SetParent(root, false);
             var cam = camGo.AddComponent<Camera>();
             cam.clearFlags = CameraClearFlags.SolidColor;
-            cam.backgroundColor = new Color(0.02f, 0.02f, 0.03f);
-            cam.fieldOfView = 50f;
+            cam.backgroundColor = new Color(0.015f, 0.012f, 0.02f);
+            cam.fieldOfView = 48f;
+            cam.nearClipPlane = 0.05f;
             camGo.tag = "MainCamera";
             camGo.AddComponent<AudioListener>();
 
             var director = camGo.AddComponent<StageCameraDirector>();
             director.mainCam = cam;
-            director.lobbyOrbit = MakeMount(root, "Cam_LobbyOrbit", new Vector3(4.2f, 2.1f, -4.2f), new Vector3(0f, 1.2f, 0.5f));
-            director.hostPush = MakeMount(root, "Cam_HostPush", new Vector3(0.3f, 1.7f, 0.4f), new Vector3(0f, 1.6f, 2.5f));
-            director.miniWide = MakeMount(root, "Cam_MiniWide", new Vector3(0f, 4.5f, -8f), new Vector3(0f, 0.5f, 0f));
-            director.podium = MakeMount(root, "Cam_Podium", new Vector3(0f, 1.8f, -3.5f), new Vector3(0f, 1.2f, 0f));
-            director.babyLane = MakeMount(root, "Cam_BabyLane", new Vector3(0f, 2.2f, 2.5f), new Vector3(0f, 1.2f, 6.5f));
-            director.eyesCut = MakeMount(root, "Cam_Eyes", new Vector3(0f, 1.4f, -3.8f), new Vector3(0f, 1.2f, -5.5f));
+            director.lobbyOrbit = MakeMount(root, "Cam_LobbyOrbit", new Vector3(4.5f, 2.2f, -4.0f), new Vector3(0f, 1.3f, 1.0f));
+            director.hostPush = MakeMount(root, "Cam_HostPush", new Vector3(0.45f, 1.85f, 0.55f), new Vector3(0f, 1.7f, 2.5f));
+            director.miniWide = MakeMount(root, "Cam_MiniWide", new Vector3(0f, 5.0f, -9f), new Vector3(0f, 0.6f, 0f));
+            director.podium = MakeMount(root, "Cam_Podium", new Vector3(0f, 1.9f, -3.2f), new Vector3(0f, 1.3f, 0f));
+            director.babyLane = MakeMount(root, "Cam_BabyLane", new Vector3(0.2f, 2.0f, 2.8f), new Vector3(0f, 1.1f, 6.8f));
+            director.eyesCut = MakeMount(root, "Cam_Eyes", new Vector3(0f, 1.5f, -4.2f), new Vector3(0f, 1.3f, -6.0f));
             director.CutTo(director.lobbyOrbit);
 
-            // UI canvas + VHS
+            // UI — keep thin so 3D reads first
             var canvasGo = new GameObject("ShowCanvas");
             canvasGo.transform.SetParent(root, false);
             var canvas = canvasGo.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvasGo.AddComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            var scaler = canvasGo.AddComponent<CanvasScaler>();
+            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            scaler.referenceResolution = new Vector2(1920, 1080);
             canvasGo.AddComponent<GraphicRaycaster>();
 
-            var vhs = BuildVhs(canvasGo.transform);
+            BuildVhs(canvasGo.transform);
             var hud = ShowHud.Create(canvasGo.transform);
 
-            var hostPresenter = hostGo.AddComponent<HostPresenter>();
-            hostPresenter.hostRoot = hostGo.transform;
-            hostPresenter.mouth = mouth.transform;
+            var hostPresenter = hostBuild.root.AddComponent<HostPresenter>();
+            hostPresenter.hostRoot = hostBuild.root.transform;
+            hostPresenter.mouth = hostBuild.mouth;
+            hostPresenter.head = hostBuild.head;
             hostPresenter.cardText = hud.hostCard;
             hostPresenter.subtitleText = hud.hostSubtitle;
 
@@ -159,9 +108,6 @@ namespace Saury.Bootstrap
             flow.pissing = flowGo.AddComponent<PissingContestMinigame>();
             flow.bbq = flowGo.AddComponent<BbqBrawlMinigame>();
 
-            // Hide unused warning
-            _ = vhs;
-
             return flow;
         }
 
@@ -179,17 +125,17 @@ namespace Saury.Bootstrap
             var frame = new GameObject("VHSFrame");
             frame.transform.SetParent(canvas, false);
             var frameImg = frame.AddComponent<Image>();
-            frameImg.color = new Color(0.05f, 0.05f, 0.06f, 0.35f);
+            frameImg.color = new Color(0.05f, 0.05f, 0.06f, 0.22f);
             var frt = frame.GetComponent<RectTransform>();
             frt.anchorMin = Vector2.zero;
             frt.anchorMax = Vector2.one;
-            frt.offsetMin = new Vector2(18, 18);
-            frt.offsetMax = new Vector2(-18, -18);
+            frt.offsetMin = new Vector2(22, 22);
+            frt.offsetMax = new Vector2(-22, -22);
 
             var scan = new GameObject("Scanlines");
             scan.transform.SetParent(canvas, false);
             var scanImg = scan.AddComponent<Image>();
-            scanImg.color = new Color(0f, 0f, 0f, 0.15f);
+            scanImg.color = new Color(0f, 0f, 0f, 0.1f);
             var srt = scan.GetComponent<RectTransform>();
             srt.anchorMin = Vector2.zero;
             srt.anchorMax = Vector2.one;
@@ -199,7 +145,7 @@ namespace Saury.Bootstrap
             var noise = new GameObject("Noise");
             noise.transform.SetParent(canvas, false);
             var raw = noise.AddComponent<RawImage>();
-            raw.color = new Color(1f, 1f, 1f, 0.08f);
+            raw.color = new Color(1f, 1f, 1f, 0.05f);
             var nrt = noise.GetComponent<RectTransform>();
             nrt.anchorMin = Vector2.zero;
             nrt.anchorMax = Vector2.one;
@@ -210,7 +156,6 @@ namespace Saury.Bootstrap
             overlay.noise = raw;
             overlay.scanlines = scanImg;
             overlay.frame = frameImg;
-            // Keep VHS behind readable text: move to first sibling
             frame.transform.SetAsFirstSibling();
             scan.transform.SetAsFirstSibling();
             noise.transform.SetAsFirstSibling();

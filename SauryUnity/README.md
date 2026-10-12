@@ -64,6 +64,16 @@ Lobby → Make Dad → Hub intro
 
 No API key required. `MockBabyGenerator` builds a new cursed mesh + roast line each win from Dad seed + Mom anchor + trait locks + chaos salt. Swap the coroutine body later for a real image/mesh API.
 
+## 3D blockout
+
+Procedural mesh kits (not flat UI mockups):
+
+- `Scripts/Bootstrap/StageKit.cs` — hub set, practical spots  
+- `Scripts/Bootstrap/CharacterKit.cs` — Host + 6 creature dads + baby  
+- Minigame arenas build real 3D yards/patios with kit dads  
+
+Capture live Game view: Play → **Saury → Capture 3D Slice Screenshots**.
+
 ## Known cloud-agent blocker
 
 Headless VMs can install the Editor via Unity CLI (`unity install 6000.3.26f1`) but **cannot enter Play Mode without a Unity account license**. Develop/play on a licensed desktop Hub install.
