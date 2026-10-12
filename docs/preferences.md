@@ -65,3 +65,7 @@ Canonical code repo: [https://github.com/mimcqueen/Saury](https://github.com/mim
 ## 2026-10-12 — How Mitchell steers quality
 
 Mitchell Play-tests locally in Unity; greybox “idea is there but rough” is not done. Prefer **reference images**, **one north-star focus per pass**, and explicit **wrong/meh/close** grades on atmosphere / characters / UI / fun. Don’t expand mechanics while the stage still looks like debug scaffolding.
+
+## 2026-10-12 — Visual refs = art north star
+
+Mitchell’s reference folder at `media/refs/` (Gang Beasts barn/aquarium/elevators, party laser arena, Buckshot table hub, horror bathroom for piss contest) is the **art / camera north star**. Lessons distilled in [docs/art-direction.md](docs/art-direction.md). Expanded mini slate: [docs/minigame-brainstorm.md](docs/minigame-brainstorm.md).
