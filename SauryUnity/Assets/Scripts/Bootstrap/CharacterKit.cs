@@ -141,13 +141,15 @@ namespace Saury.Bootstrap
             MeshKit.Part(visual, "Pelvis", PrimitiveType.Sphere,
                 new Vector3(0f, 0.72f, 0f), new Vector3(0.45f, 0.28f, 0.32f), limb, smoothness: 0.3f);
 
-            // Legs — connected chains
-            MeshKit.LimbChain(visual, "ThighL", new Vector3(-0.14f, 0.7f, 0f), new Vector3(8f, 0f, 8f), 0.42f, 0.09f, limb);
-            MeshKit.LimbChain(visual, "ThighR", new Vector3(0.14f, 0.7f, 0f), new Vector3(8f, 0f, -8f), 0.42f, 0.09f, limb);
+            // Legs — slightly softer / Gang Beasts–readable (fatter limbs, wider stance)
+            MeshKit.LimbChain(visual, "ThighL", new Vector3(-0.18f, 0.7f, 0f), new Vector3(10f, 0f, 12f), 0.44f, 0.11f, limb);
+            MeshKit.LimbChain(visual, "ThighR", new Vector3(0.18f, 0.7f, 0f), new Vector3(10f, 0f, -12f), 0.44f, 0.11f, limb);
+            MeshKit.LimbChain(visual, "CalfL", new Vector3(-0.2f, 0.32f, 0.02f), new Vector3(6f, 0f, 6f), 0.3f, 0.095f, limb);
+            MeshKit.LimbChain(visual, "CalfR", new Vector3(0.2f, 0.32f, 0.02f), new Vector3(6f, 0f, -6f), 0.3f, 0.095f, limb);
             MeshKit.Part(visual, "FootL", PrimitiveType.Sphere,
-                new Vector3(-0.16f, 0.08f, 0.06f), new Vector3(0.18f, 0.1f, 0.26f), accent, smoothness: 0.25f);
+                new Vector3(-0.2f, 0.07f, 0.08f), new Vector3(0.22f, 0.12f, 0.3f), accent, smoothness: 0.25f);
             MeshKit.Part(visual, "FootR", PrimitiveType.Sphere,
-                new Vector3(0.16f, 0.08f, 0.06f), new Vector3(0.18f, 0.1f, 0.26f), accent, smoothness: 0.25f);
+                new Vector3(0.2f, 0.07f, 0.08f), new Vector3(0.22f, 0.12f, 0.3f), accent, smoothness: 0.25f);
 
             // Torso by creature
             GameObject torso;
@@ -167,13 +169,15 @@ namespace Saury.Bootstrap
                     break;
             }
 
-            // Arms connected
-            MeshKit.LimbChain(visual, "ArmL", new Vector3(-0.32f, 1.35f, 0f), new Vector3(15f, 0f, 35f), 0.4f, 0.075f, limb);
-            MeshKit.LimbChain(visual, "ArmR", new Vector3(0.32f, 1.35f, 0f), new Vector3(15f, 0f, -35f), 0.4f, 0.075f, limb);
+            // Arms — floppy / readable silhouettes (ref 01 Gang Beasts)
+            MeshKit.LimbChain(visual, "ArmL", new Vector3(-0.36f, 1.32f, 0f), new Vector3(18f, 0f, 42f), 0.42f, 0.09f, limb);
+            MeshKit.LimbChain(visual, "ArmR", new Vector3(0.36f, 1.32f, 0f), new Vector3(18f, 0f, -42f), 0.42f, 0.09f, limb);
+            MeshKit.LimbChain(visual, "ForeL", new Vector3(-0.55f, 1.0f, 0.08f), new Vector3(25f, 0f, 28f), 0.32f, 0.08f, limb);
+            MeshKit.LimbChain(visual, "ForeR", new Vector3(0.55f, 1.0f, 0.08f), new Vector3(25f, 0f, -28f), 0.32f, 0.08f, limb);
             MeshKit.Part(visual, "HandL", PrimitiveType.Sphere,
-                new Vector3(-0.55f, 0.95f, 0.1f), Vector3.one * 0.14f, body, smoothness: 0.35f);
+                new Vector3(-0.62f, 0.78f, 0.14f), Vector3.one * 0.17f, body, smoothness: 0.35f);
             MeshKit.Part(visual, "HandR", PrimitiveType.Sphere,
-                new Vector3(0.55f, 0.95f, 0.1f), Vector3.one * 0.14f, body, smoothness: 0.35f);
+                new Vector3(0.62f, 0.78f, 0.14f), Vector3.one * 0.17f, body, smoothness: 0.35f);
 
             // Head
             Vector3 headScale = creature switch

@@ -11,32 +11,29 @@ using UnityEngine.UI;
 
 namespace Saury.Bootstrap
 {
-    /// <summary>Procedural Maury hub — real 3D set + character kits.</summary>
+    /// <summary>Procedural Maury hub — Buckshot-table intimacy + character kits.</summary>
     public static class StageWorldBuilder
     {
         public static GameFlowController Build()
         {
             var root = new GameObject("SauryWorld").transform;
 
-            // Spotlights crush the world — almost no fill
+            // Crushing dark — Buckshot practicals only (ref 05)
             RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
-            RenderSettings.ambientLight = new Color(0.012f, 0.01f, 0.014f);
+            RenderSettings.ambientLight = new Color(0.006f, 0.005f, 0.008f);
             RenderSettings.fog = true;
-            RenderSettings.fogColor = new Color(0.01f, 0.008f, 0.012f);
+            RenderSettings.fogColor = new Color(0.004f, 0.003f, 0.005f);
             RenderSettings.fogMode = FogMode.ExponentialSquared;
-            RenderSettings.fogDensity = 0.045f;
+            RenderSettings.fogDensity = 0.065f;
 
             StageKit.BuildHubSet(root);
 
-            // CPU Host — sleazy talk-show doll seated clearly behind desk
             var hostBuild = CharacterKit.BuildHost(root, new Vector3(0f, 0.55f, 2.85f));
 
-            // Audience eyes — many pairs in the dark
             var eyesRoot = new GameObject("AudienceEyes").transform;
             eyesRoot.SetParent(root, false);
             eyesRoot.gameObject.AddComponent<AudienceEyes>().Build(eyesRoot, 28);
 
-            // Hub dad dolls on stools
             for (int i = 0; i < 4; i++)
             {
                 var creature = (CreatureId)(i % 6);
@@ -51,13 +48,12 @@ namespace Saury.Bootstrap
                 rb.useGravity = false;
             }
 
-            // Camera — Liar's Bar intimacy
             var camGo = new GameObject("MainShowCamera");
             camGo.transform.SetParent(root, false);
             var cam = camGo.AddComponent<Camera>();
             cam.clearFlags = CameraClearFlags.SolidColor;
-            cam.backgroundColor = new Color(0.008f, 0.006f, 0.01f);
-            cam.fieldOfView = 42f;
+            cam.backgroundColor = new Color(0.004f, 0.003f, 0.006f);
+            cam.fieldOfView = 38f;
             cam.nearClipPlane = 0.05f;
             cam.allowHDR = true;
             camGo.tag = "MainCamera";
@@ -65,17 +61,35 @@ namespace Saury.Bootstrap
 
             var director = camGo.AddComponent<StageCameraDirector>();
             director.mainCam = cam;
-            director.lobbyOrbit = MakeMount(root, "Cam_LobbyOrbit", new Vector3(3.8f, 1.85f, -3.4f), new Vector3(0f, 1.35f, 1.2f));
-            // Hero Host desk push-in (sells sleazy doll + mic + desk in one glance)
-            director.hostPush = MakeMount(root, "Cam_HostPush", new Vector3(1.8f, 1.85f, -0.2f), new Vector3(0f, 1.65f, 2.75f));
-            director.miniWide = MakeMount(root, "Cam_MiniWide", new Vector3(0f, 4.8f, -9f), new Vector3(0f, 0.6f, 0f));
-            director.podium = MakeMount(root, "Cam_Podium", new Vector3(0f, 1.75f, -3.0f), new Vector3(0f, 1.25f, 0f));
-            // Hero baby lane — 3/4 plinth + lane pomp
-            director.babyLane = MakeMount(root, "Cam_BabyLane", new Vector3(2.6f, 2.15f, 7.4f), new Vector3(0f, 1.45f, 9.6f));
-            director.eyesCut = MakeMount(root, "Cam_Eyes", new Vector3(0f, 1.35f, -4.0f), new Vector3(0f, 1.2f, -6.2f));
+
+            // Intimate lobby orbit seed (TickLobbyOrbit rewrites each frame)
+            director.lobbyOrbit = CamMount.Create(root, "Cam_LobbyOrbit",
+                new Vector3(2.8f, 1.55f, -1.8f), new Vector3(0f, 1.45f, 2.35f), 38f).transform;
+
+            // Buckshot desk push — subject lit, crushed blacks, Host readable (ref 05)
+            director.hostPush = CamMount.Create(root, "Cam_HostPush",
+                new Vector3(1.15f, 1.55f, 0.35f), new Vector3(0f, 1.55f, 2.85f), 36f).transform;
+
+            // Make Dad: across-the-table intimacy on Host + marks
+            director.makeDadTable = CamMount.Create(root, "Cam_MakeDadTable",
+                new Vector3(0.15f, 1.35f, -2.1f), new Vector3(0f, 1.4f, 2.4f), 40f).transform;
+
+            // Mini high-angle placeholder — AimMiniHighAngle relocates per arena
+            director.miniWide = CamMount.Create(root, "Cam_MiniWide",
+                new Vector3(0f, 9.2f, -7f), new Vector3(0f, 0.35f, 0.4f), 48f).transform;
+
+            director.podium = CamMount.Create(root, "Cam_Podium",
+                new Vector3(0.4f, 1.65f, -2.4f), new Vector3(0f, 1.35f, 1.5f), 40f).transform;
+
+            // Bowling-alley pomp — sell the cradle / plinth
+            director.babyLane = CamMount.Create(root, "Cam_BabyLane",
+                new Vector3(3.4f, 2.55f, 5.2f), new Vector3(0f, 1.55f, 9.8f), 34f).transform;
+
+            director.eyesCut = CamMount.Create(root, "Cam_Eyes",
+                new Vector3(0f, 1.25f, -3.6f), new Vector3(0f, 1.15f, -6.2f), 32f).transform;
+
             director.CutTo(director.lobbyOrbit);
 
-            // UI — keep thin so 3D reads first
             var canvasGo = new GameObject("ShowCanvas");
             canvasGo.transform.SetParent(root, false);
             var canvas = canvasGo.AddComponent<Canvas>();
@@ -113,15 +127,6 @@ namespace Saury.Bootstrap
             flow.bbq = flowGo.AddComponent<BbqBrawlMinigame>();
 
             return flow;
-        }
-
-        static Transform MakeMount(Transform parent, string name, Vector3 pos, Vector3 lookAt)
-        {
-            var t = new GameObject(name).transform;
-            t.SetParent(parent, false);
-            t.position = pos;
-            t.LookAt(lookAt);
-            return t;
         }
 
         static VhsOverlay BuildVhs(Transform canvas)

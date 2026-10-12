@@ -253,11 +253,12 @@ def build_hub():
     for i in range(5):
         mesh(f"Letter{i}", "cube", U(-1.2 + i * 0.6, 3.75, 5.1), (0.35, 0.05, 0.4), M_AMBER)
 
-    # Spots crush the world — tight cones on subjects
-    spot("Key", U(2.2, 4.2, 0.6), U(0, 1.7, 2.7), (1, 0.92, 0.72), 1800, 24)
-    spot("Face", (0.9, 1.1, 2.5), (0.0, 2.75, 1.85), (1, 0.96, 0.88), 1400, 20)
-    spot("Dad", U(-1.8, 4.2, -2.8), U(0, 1.1, -1.5), (1, 0.85, 0.65), 1600, 36)
-    spot("Rim", U(-0.5, 4.6, 4.2), U(0, 1.7, 2.8), (1, 0.5, 0.35), 700, 28)
+    # Buckshot ref 05 — hanging practical cans, crushed blacks
+    spot("Key", U(1.4, 4.4, 0.2), U(0, 1.55, 2.7), (1, 0.88, 0.62), 2200, 28)
+    spot("Key2", U(-1.3, 4.35, 0.4), U(0, 1.45, 2.5), (1, 0.78, 0.5), 1600, 26)
+    spot("Face", (0.9, 1.1, 2.5), (0.0, 2.75, 1.85), (1, 0.96, 0.88), 1200, 18)
+    spot("Dad", U(-1.8, 4.2, -2.2), U(0, 1.0, -1.3), (1, 0.82, 0.58), 900, 34)
+    spot("Rim", U(0, 4.5, 4.4), U(0, 1.6, 2.6), (1, 0.45, 0.32), 500, 24)
     # Soft face fill so the doll reads without washing the void
     bpy.ops.object.light_add(type="AREA", location=(0.6, 0.9, 2.2))
     fill = bpy.context.active_object
@@ -337,25 +338,36 @@ def build_baby_lane():
 
 
 def build_piss():
+    """Grimy PS1 bathroom (ref 06) — tiles, sinks, stalls."""
     def P(x, y, z):
         return (22 + x, z, y)
 
-    mesh("Yard", "cube", P(0, -0.05, 0), (16, 10, 0.1), M_GRASS)
-    for i in range(9):
-        mesh(f"Post{i}", "cylinder", P(-7 + i * 1.75, 0.75, 4.6), (0.08, 0.08, 0.75), M_CHAIN)
-    mesh("FenceRail", "cube", P(0, 1.2, 4.6), (15, 0.06, 0.06), M_CHAIN)
-    mesh("Trailer", "cube", P(-6.2, 1.1, -3.6), (4.2, 2.4, 2.1), M_PLASTIC)
-    mesh("TrailerStripe", "cube", P(-6.2, 1.5, -2.35), (4.0, 0.05, 0.25), M_BRUISE)
-    mesh("TrailerWin", "cube", P(-5.2, 1.6, -2.35), (0.8, 0.04, 0.55), M_AMBER)
+    M_TILE = mat("tile", (0.42, 0.4, 0.36), 0.85)
+    M_TILE_D = mat("tiled", (0.35, 0.3, 0.24), 0.88)
+    M_PORC = mat("porc", (0.72, 0.7, 0.65), 0.4)
+    mesh("TileFloor", "cube", P(0, -0.05, 0), (14, 11, 0.1), M_TILE)
     for i in range(5):
-        mesh(f"Can{i}", "cylinder", P(-3 + i * 1.5, 0.35, 2.6), (0.5, 0.5, 0.35), M_METAL)
-    mesh("Pot", "cylinder", P(0, 0.25, 3.6), (0.55, 0.55, 0.25), M_WOOD)
-    mesh("Plant", "sphere", P(0, 0.85, 3.6), (0.9, 0.9, 1.1), mat("fol", (0.2, 0.5, 0.22)))
-    mesh("Pool", "cylinder", P(5.5, 0.15, -2.5), (1.8, 1.8, 0.15), M_CYAN)
-    spot("YardSpot", P(0, 5.2, -2), P(0, 0.8, 0), (1, 0.92, 0.7), 3800, 48)
-    spot("YardFill", P(3, 3.5, 2), P(0, 0.6, 0), (1, 0.85, 0.6), 1200, 55)
+        mesh(f"Void{i}", "cube", P(-4 + i * 2.1, -0.02, -1.5 + (i % 2) * 2.2), (0.7, 0.7, 0.08), M_BLACK)
+    mesh("WallBack", "cube", P(0, 1.8, 5.2), (14, 0.25, 3.6), M_TILE_D)
+    mesh("WallL", "cube", P(-7, 1.8, 0), (0.25, 11, 3.6), M_TILE)
+    mesh("WallR", "cube", P(7, 1.8, 0), (0.25, 11, 3.6), M_TILE)
+    for i in range(3):
+        z = -1.5 + i * 1.6
+        mesh(f"Basin{i}", "cube", P(-6.2, 0.95, z), (1.1, 0.7, 0.18), M_PORC)
+        mesh(f"Mirror{i}", "cube", P(-6.2, 1.85, z - 0.35), (1.0, 0.04, 0.85), mat(f"mir{i}", (0.25, 0.28, 0.3), 0.25))
+    mesh("Stall", "cube", P(5.2, 1.4, 0.5), (0.12, 4.5, 2.8), mat("stall", (0.22, 0.2, 0.18)))
+    mesh("StallDoor", "cube", P(4.4, 1.3, -1.8), (1.2, 0.08, 2.4), mat("sdoor", (0.28, 0.26, 0.24)))
+    for i in range(5):
+        mesh(f"Can{i}", "cylinder", P(-3 + i * 1.5, 0.35, 2.4), (0.5, 0.5, 0.35), M_METAL)
+    mesh("Pot", "cylinder", P(0, 0.25, 3.5), (0.55, 0.55, 0.25), M_WOOD)
+    mesh("Plant", "sphere", P(0, 0.85, 3.5), (0.9, 0.9, 1.1), mat("fol", (0.22, 0.48, 0.22)))
+    spot("BathSpot", P(0, 5.2, -1.5), P(0, 0.4, 1), (0.95, 0.88, 0.7), 3600, 50)
+    bpy.ops.object.light_add(type="POINT", location=P(-3, 3.5, 2))
+    fl = bpy.context.active_object
+    fl.data.energy = 180
+    fl.data.color = (0.55, 0.65, 0.55)
     for i in range(4):
-        dad((22 - 3.2 + i * 2.0, 0, -2.4), i % 6, f"PissDad{i}", 1.0)
+        dad((22 - 3.2 + i * 2.0, 0, -2.6), i % 6, f"PissDad{i}", 1.0)
 
 
 def build_bbq():
@@ -409,36 +421,40 @@ def main():
     build_piss()
     build_bbq()
 
-    # Blender space: (x, depth=+stage, height). Audience -depth.
+    # Match Unity StageCameraDirector mounts (Buckshot intimacy / high-angle minis / baby pomp)
     shots = [
-        (U(4.2, 2.0, -3.6), U(0.0, 1.4, 1.5), 34, "01-hub-lobby.png"),
-        # HERO host: audience 3/4 over desk — doll face + mic + CRT + nameplate
-        ((1.8, -0.2, 1.85), (0.0, 2.75, 1.65), 35, "02-host-desk.png"),
-        (U(-2.6, 1.65, -3.0), U(-0.8, 1.2, -1.4), 32, "03-make-dad-hub.png"),
-        ((20.5, -7.0, 3.4), (20.5, -0.8, 1.0), 30, "04-pissing-contest.png"),
-        # HERO baby: 3/4 on plinth with lane + chase lights in frame
-        ((2.6, 7.4, 2.15), (0.0, 9.6, 1.45), 28, "05-baby-showcase.png"),
-        ((-19.5, -6.6, 3.2), (-22.0, 0.2, 1.1), 30, "06-bbq-brawl.png"),
+        # Lobby orbit seed — desk-centered intimacy
+        (U(2.8, 1.55, -1.8), U(0.0, 1.45, 2.35), 38, "01-hub-lobby.png"),
+        # Buckshot Host push
+        ((1.15, 0.35, 1.55), (0.0, 2.85, 1.55), 36, "02-host-desk.png"),
+        # Make Dad across-table
+        (U(0.15, 1.35, -2.1), U(0.0, 1.4, 2.4), 40, "03-make-dad-hub.png"),
+        # Fixed high-angle bathroom arena (all 4 dads readable)
+        ((22.0, -7.1, 9.2), (22.0, 0.9, 0.35), 28, "04-pissing-contest.png"),
+        # Bowling pomp baby
+        ((3.4, 5.2, 2.55), (0.0, 9.8, 1.55), 34, "05-baby-showcase.png"),
+        # High-angle BBQ
+        ((-22.0, -7.6, 9.2), (-22.0, 0.4, 0.35), 28, "06-bbq-brawl.png"),
     ]
     for loc, look, lens, fn in shots:
         render(cam(loc, look, lens), fn)
 
     with open(os.path.join(OUT, "README.md"), "w") as f:
         f.write(
-            """# Unity slice media — art pass 2
+            """# Unity slice media — demo camera / HUD pass
 
-**Eerie dingy Maury / Liar’s Bar** blockout stills (connected dolls, crushed-black spots, bowling pomp).
+Offline **Blender EEVEE** stills approximating Unity procedural kits after the **demo polish** pass (Buckshot hub cams, bathroom Pissing Contest, high-angle minis, baby pomp). **Not** Unity Game-view — no Unity license on this VM. HUD/chrome not burned into these stills.
 
 | File | Beat |
 |------|------|
-| `01-hub-lobby.png` | Hub stage intimacy |
-| `02-host-desk.png` | **Hero** CPU Host desk |
-| `03-make-dad-hub.png` | Creature dad dolls |
-| `04-pissing-contest.png` | Trailer-yard mini |
-| `05-baby-showcase.png` | **Hero** bowling-alley baby |
-| `06-bbq-brawl.png` | Backyard BBQ arena |
+| `01-hub-lobby.png` | Buckshot-table hub intimacy |
+| `02-host-desk.png` | Host desk practicals / crushed blacks |
+| `03-make-dad-hub.png` | Across-table Make Dad |
+| `04-pissing-contest.png` | Grimy bathroom mini (ref 06 cues) · high angle |
+| `05-baby-showcase.png` | Bowling-alley baby pomp |
+| `06-bbq-brawl.png` | BBQ brawl · high angle |
 
-**Caption:** Offline **Blender EEVEE** renders of the same procedural hierarchy Unity builds (`StageKit` / `CharacterKit` / baby lane / arenas). Not Unity Game-view — this VM has Editor 6000.3.26f1 but **no Unity license**. On a licensed Hub: Play Bootstrap → **Saury → Capture 3D Slice Screenshots**.
+Mitchell: Play `Bootstrap.unity` → **Saury → Capture 3D Slice Screenshots** for live Game-view PNGs (demo HUD included).
 """
         )
     print("DONE", file=sys.stderr)

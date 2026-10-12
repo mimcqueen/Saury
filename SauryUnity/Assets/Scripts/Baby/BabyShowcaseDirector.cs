@@ -1,5 +1,6 @@
 using System.Collections;
 using Saury.Bootstrap;
+using Saury.Core;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -118,7 +119,8 @@ namespace Saury.Baby
         {
             if (titleText != null) titleText.text = "GENERATING CUSTODY…";
             if (roastText != null) roastText.text = "DNA MACHINE whirrrrs…";
-            if (promptText != null) promptText.text = baby.promptUsed;
+            if (promptText != null)
+                promptText.text = DemoSettings.ShowDebug ? baby.promptUsed : "";
 
             // Dip house-ish: chase only
             if (_heroSpot != null) _heroSpot.intensity = 0f;

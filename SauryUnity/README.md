@@ -44,7 +44,9 @@ Lobby → Make Dad → Hub intro
 
 ### Flow helpers
 - **Enter** during lobby — start early  
-- **F1** — force ready / skip short waits (dev)
+- **F1** — force ready / skip short waits (dev)  
+- **F3** — toggle debug HUD body (Demo Mode is ON by default)  
+- Seats 2–4 use simple AI for solo demos
 
 ## Architecture (slice)
 

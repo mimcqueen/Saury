@@ -120,13 +120,15 @@ namespace Saury.Bootstrap
 
         static void BuildPracticalSpots(Transform root)
         {
-            // Only subjects lit — key on Host, soft fill, rim from curtains
-            BuildPracticalSpot(root, "SpotKey", new Vector3(1.6f, 4.7f, -1.2f), new Vector3(0f, 1.5f, 2.4f),
-                new Color(1f, 0.9f, 0.7f), 5.5f, 42f);
-            BuildPracticalSpot(root, "SpotDad", new Vector3(-1.5f, 4.5f, -2.5f), new Vector3(0f, 1.0f, -1.2f),
-                new Color(1f, 0.85f, 0.65f), 3.2f, 48f);
-            BuildPracticalSpot(root, "SpotRim", new Vector3(0f, 4.6f, 4.2f), new Vector3(0f, 1.6f, 2.5f),
-                new Color(1f, 0.55f, 0.4f), 2.0f, 35f);
+            // Buckshot ref 05 — hanging practical cans, subject lit, crushed blacks
+            BuildPracticalSpot(root, "SpotKey", new Vector3(1.4f, 4.4f, 0.2f), new Vector3(0f, 1.55f, 2.7f),
+                new Color(1f, 0.88f, 0.62f), 7.2f, 34f);
+            BuildPracticalSpot(root, "SpotKey2", new Vector3(-1.3f, 4.35f, 0.4f), new Vector3(0f, 1.45f, 2.5f),
+                new Color(1f, 0.78f, 0.5f), 4.8f, 30f);
+            BuildPracticalSpot(root, "SpotDad", new Vector3(-1.8f, 4.2f, -2.2f), new Vector3(0f, 1.0f, -1.3f),
+                new Color(1f, 0.82f, 0.58f), 2.4f, 40f);
+            BuildPracticalSpot(root, "SpotRim", new Vector3(0f, 4.5f, 4.4f), new Vector3(0f, 1.6f, 2.6f),
+                new Color(1f, 0.45f, 0.32f), 1.4f, 28f);
         }
 
         public static void BuildPracticalSpot(Transform root, string name, Vector3 fixturePos, Vector3 aimAt, Color color, float intensity, float angle)

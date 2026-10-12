@@ -1,12 +1,17 @@
+using Saury.Core;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Saury.UI
 {
-    /// <summary>Thin show chrome — 3D stage stays the hero, not a UI diagram.</summary>
+    /// <summary>
+    /// Minimal TV-show chrome — phase title, timer, custody stars, short control hint.
+    /// Not a console dump. Debug body panel only when DemoSettings.ShowDebug.
+    /// </summary>
     public class ShowHud : MonoBehaviour
     {
         public Text phaseText;
+        public Text timerText;
         public Text hostCard;
         public Text hostSubtitle;
         public Text bodyText;
@@ -15,6 +20,7 @@ namespace Saury.UI
         public Text babyPrompt;
         public Text starsText;
         public Text controlsText;
+        public Text debugHint;
 
         public static ShowHud Create(Transform canvasRoot)
         {
@@ -22,36 +28,94 @@ namespace Saury.UI
             go.transform.SetParent(canvasRoot, false);
             var hud = go.AddComponent<ShowHud>();
 
-            hud.phaseText = MakeText(go.transform, "Phase", 22, TextAnchor.UpperLeft, new Vector2(28, -24), new Vector2(480, 32),
-                new Color(0.95f, 0.88f, 0.7f, 0.85f));
-            hud.hostCard = MakeText(go.transform, "HostCard", 34, TextAnchor.UpperCenter, new Vector2(0, -36), new Vector2(900, 44),
+            // Top bar: phase (L) · host card (C) · timer + stars (R)
+            hud.phaseText = MakeText(go.transform, "Phase", 20, TextAnchor.UpperLeft, new Vector2(28, -22), new Vector2(360, 28),
+                new Color(0.95f, 0.88f, 0.7f, 0.9f));
+            hud.hostCard = MakeText(go.transform, "HostCard", 32, TextAnchor.UpperCenter, new Vector2(0, -28), new Vector2(820, 40),
                 new Color(1f, 0.92f, 0.75f, 0.95f));
-            hud.hostSubtitle = MakeText(go.transform, "HostSub", 18, TextAnchor.UpperCenter, new Vector2(0, -78), new Vector2(800, 28),
-                new Color(0.85f, 0.8f, 0.7f, 0.8f));
-            // Compact lower-left panel for make-dad / mini scores — not a full-screen diagram
-            hud.bodyText = MakeText(go.transform, "Body", 17, TextAnchor.LowerLeft, new Vector2(28, 56), new Vector2(520, 280),
-                new Color(0.92f, 0.88f, 0.78f, 0.88f));
-            hud.babyTitle = MakeText(go.transform, "BabyTitle", 26, TextAnchor.LowerCenter, new Vector2(0, 110), new Vector2(900, 36),
+            hud.hostSubtitle = MakeText(go.transform, "HostSub", 16, TextAnchor.UpperCenter, new Vector2(0, -68), new Vector2(720, 24),
+                new Color(0.85f, 0.8f, 0.7f, 0.75f));
+            hud.timerText = MakeText(go.transform, "Timer", 28, TextAnchor.UpperRight, new Vector2(-28, -22), new Vector2(120, 36),
+                new Color(0.95f, 0.9f, 0.55f, 0.95f));
+            hud.starsText = MakeText(go.transform, "Stars", 15, TextAnchor.UpperRight, new Vector2(-28, -58), new Vector2(260, 90),
+                new Color(0.92f, 0.88f, 0.7f, 0.8f));
+
+            // Debug / make-dad detail — hidden in demo mode
+            hud.bodyText = MakeText(go.transform, "Body", 16, TextAnchor.LowerLeft, new Vector2(28, 48), new Vector2(480, 240),
+                new Color(0.9f, 0.86f, 0.76f, 0.82f));
+
+            // Baby chrome — lower center, sparse
+            hud.babyTitle = MakeText(go.transform, "BabyTitle", 24, TextAnchor.LowerCenter, new Vector2(0, 96), new Vector2(860, 32),
                 new Color(1f, 0.85f, 0.9f, 0.95f));
-            hud.babyRoast = MakeText(go.transform, "BabyRoast", 18, TextAnchor.LowerCenter, new Vector2(0, 78), new Vector2(900, 28),
-                new Color(0.9f, 0.82f, 0.75f, 0.9f));
-            hud.babyPrompt = MakeText(go.transform, "BabyPrompt", 12, TextAnchor.LowerCenter, new Vector2(0, 52), new Vector2(1000, 24),
-                new Color(0.65f, 0.6f, 0.55f, 0.65f));
-            hud.starsText = MakeText(go.transform, "Stars", 16, TextAnchor.UpperRight, new Vector2(-28, -24), new Vector2(280, 100),
-                new Color(0.95f, 0.9f, 0.7f, 0.85f));
-            hud.controlsText = MakeText(go.transform, "Controls", 13, TextAnchor.LowerRight, new Vector2(-28, 20), new Vector2(420, 28),
-                new Color(0.7f, 0.68f, 0.62f, 0.55f));
+            hud.babyRoast = MakeText(go.transform, "BabyRoast", 16, TextAnchor.LowerCenter, new Vector2(0, 68), new Vector2(860, 26),
+                new Color(0.9f, 0.82f, 0.75f, 0.88f));
+            hud.babyPrompt = MakeText(go.transform, "BabyPrompt", 11, TextAnchor.LowerCenter, new Vector2(0, 46), new Vector2(920, 20),
+                new Color(0.6f, 0.55f, 0.5f, 0.45f));
+
+            hud.controlsText = MakeText(go.transform, "Controls", 13, TextAnchor.LowerRight, new Vector2(-28, 18), new Vector2(460, 26),
+                new Color(0.72f, 0.7f, 0.62f, 0.55f));
+            hud.debugHint = MakeText(go.transform, "DebugHint", 11, TextAnchor.LowerLeft, new Vector2(28, 14), new Vector2(360, 18),
+                new Color(0.55f, 0.55f, 0.5f, 0.35f));
 
             hud.hostCard.alignment = TextAnchor.UpperCenter;
             hud.hostSubtitle.alignment = TextAnchor.UpperCenter;
+            hud.timerText.alignment = TextAnchor.UpperRight;
             hud.babyTitle.alignment = TextAnchor.LowerCenter;
             hud.babyRoast.alignment = TextAnchor.LowerCenter;
             hud.babyPrompt.alignment = TextAnchor.LowerCenter;
             hud.starsText.alignment = TextAnchor.UpperRight;
             hud.controlsText.alignment = TextAnchor.LowerRight;
 
-            hud.controlsText.text = "F1 skip · F5 ready-all";
+            hud.ApplyDemoChrome();
             return hud;
+        }
+
+        public void ApplyDemoChrome()
+        {
+            bool dbg = DemoSettings.ShowDebug;
+            if (bodyText != null) bodyText.gameObject.SetActive(dbg);
+            if (babyPrompt != null) babyPrompt.gameObject.SetActive(dbg);
+            if (debugHint != null)
+            {
+                debugHint.gameObject.SetActive(true);
+                debugHint.text = dbg
+                    ? "DEBUG · F3 demo · F1 skip · F5 ready-all"
+                    : "Demo · F1 skip · F3 debug";
+            }
+            if (controlsText != null && string.IsNullOrEmpty(controlsText.text))
+                controlsText.text = "P1 WASD + Space";
+        }
+
+        public void SetTimer(float secondsOrNeg)
+        {
+            if (timerText == null) return;
+            if (secondsOrNeg < 0f)
+            {
+                timerText.text = "";
+                return;
+            }
+            timerText.text = Mathf.CeilToInt(secondsOrNeg).ToString();
+        }
+
+        public void SetPhase(string title) { if (phaseText != null) phaseText.text = title; }
+
+        public void SetControlHint(string hint)
+        {
+            if (controlsText != null) controlsText.text = hint ?? "";
+        }
+
+        public void ClearBabyChrome()
+        {
+            if (babyTitle != null) babyTitle.text = "";
+            if (babyRoast != null) babyRoast.text = "";
+            if (babyPrompt != null) babyPrompt.text = "";
+        }
+
+        public void SetBody(string text)
+        {
+            if (bodyText == null) return;
+            bodyText.text = text ?? "";
+            bodyText.gameObject.SetActive(DemoSettings.ShowDebug && !string.IsNullOrEmpty(text));
         }
 
         static Text MakeText(Transform parent, string name, int size, TextAnchor anchor, Vector2 pos, Vector2 sizeDelta, Color color)

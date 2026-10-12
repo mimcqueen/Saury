@@ -16,6 +16,8 @@ namespace Saury.Dad
         int _editSlot;
         bool _active;
         Vector2 _morph;
+        /// <summary>Solo demo: auto-ready seats 2–4 so Mitchell only edits P1.</summary>
+        public bool demoAutoReadyOthers;
 
         static readonly string[] Hair = { "mullet", "high-and-tight", "greasy bangs", "balding island", "rat tail" };
         static readonly string[] Eyes = { "bloodshot", "shifty", "doe-eyed", "pixel squint", "glowing" };
@@ -30,6 +32,11 @@ namespace Saury.Dad
             _editSlot = 0;
             _active = true;
             _morph = Vector2.zero;
+            if (demoAutoReadyOthers && lobby != null)
+            {
+                for (int i = 1; i < lobby.seats.Count; i++)
+                    lobby.seats[i].ready = true;
+            }
             Refresh();
         }
 
@@ -107,22 +114,21 @@ namespace Saury.Dad
             var dad = Current();
             var lines = new List<string>
             {
-                "MAKE DAD — seed pack for AI baby",
-                $"Room {lobby.roomCode}  (owner slot {lobby.ownerSlot + 1} still plays as dad)",
-                $"Editing seat {_editSlot + 1}/{lobby.seats.Count}: {dad.displayName}",
+                "MAKE DAD",
+                $"Editing {dad.displayName}  ({_editSlot + 1}/{lobby.seats.Count})",
                 "",
-                $"Creature ←/→ : {dad.creature}",
-                $"[1] Hair: {dad.hairTag}",
-                $"[2] Eyes: {dad.eyesTag}",
-                $"[3] Prop: {dad.propTag}",
-                $"[4] Energy: {dad.energyTag}",
-                $"[5] Style: {dad.realism}",
-                $"Morph (drag mouse): {dad.morphHint}",
-                $"Ready: {(dad.ready ? "YES" : "no")}   Enter=ready  Tab=next seat  F5=ready all"
+                $"←/→  {dad.creature}",
+                $"[1] {dad.hairTag}   [2] {dad.eyesTag}",
+                $"[3] {dad.propTag}   [4] {dad.energyTag}",
+                $"[5] {dad.realism}",
+                $"Morph: {dad.morphHint}",
+                dad.ready ? "READY" : "Enter = ready · F5 = all"
             };
+            if (demoAutoReadyOthers)
+                lines.Add("(seats 2–4 auto-ready for solo demo)");
             panelText.text = string.Join("\n", lines);
             if (hintText != null)
-                hintText.text = "Selfie optional (R1) — descriptors + morph always suffice.";
+                hintText.text = "Drag mouse to morph · selfie optional";
         }
 
         static string Next(string[] opts, string cur)

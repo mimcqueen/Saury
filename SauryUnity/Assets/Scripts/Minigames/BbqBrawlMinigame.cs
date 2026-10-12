@@ -1,27 +1,33 @@
 using System.Collections;
 using System.Collections.Generic;
 using Saury.Bootstrap;
+using Saury.Core;
 using Saury.Dad;
+using Saury.UI;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Saury.Minigames
 {
     /// <summary>3D backyard brawl around a flaming grill — soft Gang Beasts–lite bodies.</summary>
     public class BbqBrawlMinigame : MonoBehaviour
     {
-        public float duration = 50f;
+        public float duration = 45f;
         public System.Action<int, int[]> onFinished;
 
         readonly List<DadAvatarMotor> _players = new List<DadAvatarMotor>();
         readonly Dictionary<int, float> _control = new Dictionary<int, float>();
         Transform _arena;
-        Text _hud;
+        ShowHud _hud;
         Transform _grill;
 
-        public void Build(Transform parent, IReadOnlyList<DadSeed> dads, Text hud)
+        public Vector3 ArenaWorldCenter =>
+            _arena != null ? _arena.position : Vector3.zero;
+
+        public void Build(Transform parent, IReadOnlyList<DadSeed> dads, ShowHud hud)
         {
             _hud = hud;
+            if (DemoSettings.demoMode) duration = 35f;
+
             _arena = new GameObject("BBQBrawlArena").transform;
             _arena.SetParent(parent, false);
             _arena.localPosition = new Vector3(-22f, 0f, 0f);
@@ -29,11 +35,9 @@ namespace Saury.Minigames
             MeshKit.Part(_arena, "Patio", PrimitiveType.Cube,
                 new Vector3(0f, -0.05f, 0f), new Vector3(14f, 0.1f, 14f),
                 new Color(0.3f, 0.24f, 0.16f), collider: true, smoothness: 0.08f);
-            // Stained concrete patches
             MeshKit.Part(_arena, "Stain", PrimitiveType.Cylinder,
                 new Vector3(1.5f, 0.01f, -1f), new Vector3(2.2f, 0.02f, 1.4f), SauryPalette.FloorStain, smoothness: 0.05f);
 
-            // Ranch house facade + porch light
             MeshKit.Part(_arena, "House", PrimitiveType.Cube,
                 new Vector3(0f, 1.6f, 6.2f), new Vector3(11f, 3.2f, 0.45f),
                 new Color(0.5f, 0.38f, 0.28f), collider: true, smoothness: 0.15f);
@@ -48,13 +52,12 @@ namespace Saury.Minigames
                 new Vector3(3.5f, 0.55f, 5.5f), new Vector3(1.3f, 1.0f, 0.8f), SauryPalette.GrassDead, smoothness: 0.2f);
             var patioSpot = new GameObject("PatioSpot");
             patioSpot.transform.SetParent(_arena, false);
-            patioSpot.transform.localPosition = new Vector3(2f, 5f, -3f);
+            patioSpot.transform.localPosition = new Vector3(2f, 5.5f, -3.5f);
             patioSpot.transform.LookAt(_arena.TransformPoint(Vector3.zero));
             var pl = patioSpot.AddComponent<Light>();
-            pl.type = LightType.Spot; pl.intensity = 4.2f; pl.range = 16f; pl.spotAngle = 50f;
+            pl.type = LightType.Spot; pl.intensity = 5.0f; pl.range = 18f; pl.spotAngle = 55f;
             pl.color = new Color(1f, 0.85f, 0.65f); pl.shadows = LightShadows.Soft;
 
-            // Grill assembly
             _grill = new GameObject("Grill").transform;
             _grill.SetParent(_arena, false);
             _grill.localPosition = Vector3.zero;
@@ -97,6 +100,7 @@ namespace Saury.Minigames
                 motor.ConfigureKeysForSlot(dad.slotIndex);
                 motor.displayName = dad.displayName;
                 motor.moveForce = 32f;
+                motor.aiTarget = _grill;
                 build.root.AddComponent<SoftGrab>().Configure(motor);
                 _players.Add(motor);
                 _control[dad.slotIndex] = 0f;
@@ -118,6 +122,7 @@ namespace Saury.Minigames
             while (t > 0f)
             {
                 t -= Time.deltaTime;
+                if (Input.GetKeyDown(KeyCode.F1)) t = 0f;
                 foreach (var p in _players)
                 {
                     if (p.eliminated) continue;
@@ -136,7 +141,11 @@ namespace Saury.Minigames
                     }
                 }
                 if (_hud != null)
-                    _hud.text = $"BACKYARD BBQ BRAWL  {Mathf.CeilToInt(t)}s\n{ControlLine()}\nAction = hop/shove · hold the grill";
+                {
+                    _hud.SetTimer(t);
+                    if (DemoSettings.ShowDebug)
+                        _hud.SetBody($"BBQ BRAWL\n{ControlLine()}\nSpace = shove · hold grill");
+                }
                 yield return null;
             }
             foreach (var p in _players) p.inputEnabled = false;
@@ -195,7 +204,8 @@ namespace Saury.Minigames
         {
             _cd -= Time.deltaTime;
             if (_motor == null || !_motor.inputEnabled) return;
-            if (!Input.GetKeyDown(_motor.action) || _cd > 0f) return;
+            bool press = _motor.aiControlled ? _motor.ActionDown : Input.GetKeyDown(_motor.action);
+            if (!press || _cd > 0f) return;
             _cd = 0.4f;
             var cols = Physics.OverlapSphere(transform.position + transform.forward * 0.7f + Vector3.up * 0.8f, 1.15f);
             foreach (var c in cols)
