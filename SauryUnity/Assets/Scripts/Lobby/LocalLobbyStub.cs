@@ -8,6 +8,7 @@ namespace Saury.Lobby
     /// Local / same-PC lobby stub. Listen-server / Steam lobbies can replace this later.
     /// Lobby owner still plays as a dad — Host is CPU only.
     /// </summary>
+    [System.Serializable]
     public class LocalLobbyStub
     {
         public string roomCode { get; private set; } = "SAUR";

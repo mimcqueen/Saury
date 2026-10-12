@@ -3,6 +3,7 @@ using Saury.Dad;
 
 namespace Saury.Core
 {
+    [System.Serializable]
     public class PlayerScoreboard
     {
         readonly Dictionary<int, int> _stars = new Dictionary<int, int>();

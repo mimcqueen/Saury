@@ -12,15 +12,15 @@ namespace Saury.Bootstrap
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void AutoBoot()
         {
-            if (Object.FindFirstObjectByType<SauryBootstrap>() != null) return;
-            if (Object.FindFirstObjectByType<Core.GameFlowController>() != null) return;
+            if (Object.FindAnyObjectByType<SauryBootstrap>() != null) return;
+            if (Object.FindAnyObjectByType<Core.GameFlowController>() != null) return;
             var go = new GameObject("SauryBootstrap");
             go.AddComponent<SauryBootstrap>();
         }
 
         void Start()
         {
-            if (Object.FindFirstObjectByType<Core.GameFlowController>() != null) return;
+            if (Object.FindAnyObjectByType<Core.GameFlowController>() != null) return;
             ClearTemplateSceneDebris();
             var flow = StageWorldBuilder.Build();
             flow.KickOff();

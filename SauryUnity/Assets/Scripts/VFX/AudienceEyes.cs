@@ -53,10 +53,12 @@ namespace Saury.VFX
             foreach (var p in _pairs)
             {
                 if (p == null) continue;
-                float n = Mathf.PerlinNoise(p.GetInstanceID() * 0.013f, Time.time * 0.55f);
+                // Stable seed without GetInstanceID (obsolete → GetEntityId on newer Unity).
+                float seed = p.GetHashCode();
+                float n = Mathf.PerlinNoise(seed * 0.013f, Time.time * 0.55f);
                 float sy = n > 0.86f ? 0.12f : 1f;
                 // Occasional slow look drift
-                float yaw = Mathf.Sin(Time.time * 0.4f + p.GetInstanceID()) * 6f;
+                float yaw = Mathf.Sin(Time.time * 0.4f + seed) * 6f;
                 p.localScale = new Vector3(1f, sy, 1f);
                 var e = p.localEulerAngles;
                 p.localRotation = Quaternion.Euler(e.x, yaw, e.z);
