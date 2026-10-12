@@ -18,57 +18,61 @@ namespace Saury.Bootstrap
         {
             var root = new GameObject("SauryWorld").transform;
 
+            // Spotlights crush the world — almost no fill
             RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
-            RenderSettings.ambientLight = new Color(0.05f, 0.045f, 0.055f);
+            RenderSettings.ambientLight = new Color(0.012f, 0.01f, 0.014f);
             RenderSettings.fog = true;
-            RenderSettings.fogColor = new Color(0.02f, 0.02f, 0.03f);
-            RenderSettings.fogDensity = 0.035f;
+            RenderSettings.fogColor = new Color(0.01f, 0.008f, 0.012f);
+            RenderSettings.fogMode = FogMode.ExponentialSquared;
+            RenderSettings.fogDensity = 0.045f;
 
             StageKit.BuildHubSet(root);
 
-            // CPU Host — modeled figure at desk
-            var hostBuild = CharacterKit.BuildHost(root, new Vector3(0f, 0.95f, 2.35f));
+            // CPU Host — sleazy talk-show doll seated clearly behind desk
+            var hostBuild = CharacterKit.BuildHost(root, new Vector3(0f, 0.55f, 2.85f));
 
-            // Audience eyes (3D pairs)
+            // Audience eyes — many pairs in the dark
             var eyesRoot = new GameObject("AudienceEyes").transform;
             eyesRoot.SetParent(root, false);
-            eyesRoot.gameObject.AddComponent<AudienceEyes>().Build(eyesRoot, 16);
+            eyesRoot.gameObject.AddComponent<AudienceEyes>().Build(eyesRoot, 28);
 
-            // Hub dad dolls on stools (readable creature blockouts)
+            // Hub dad dolls on stools
             for (int i = 0; i < 4; i++)
             {
                 var creature = (CreatureId)(i % 6);
                 var dad = CharacterKit.BuildDad(
                     root,
-                    new Vector3(-2.6f + i * 1.7f, 0.45f, -1.4f),
+                    new Vector3(-2.7f + i * 1.8f, 0.48f, -1.5f),
                     creature,
                     name: $"HubDad_{creature}");
-                dad.root.transform.localScale = Vector3.one * 0.85f;
-                // Hub dolls are scenic — freeze physics
+                dad.root.transform.localScale = Vector3.one * 0.88f;
                 var rb = dad.root.AddComponent<Rigidbody>();
                 rb.isKinematic = true;
                 rb.useGravity = false;
             }
 
-            // Camera
+            // Camera — Liar's Bar intimacy
             var camGo = new GameObject("MainShowCamera");
             camGo.transform.SetParent(root, false);
             var cam = camGo.AddComponent<Camera>();
             cam.clearFlags = CameraClearFlags.SolidColor;
-            cam.backgroundColor = new Color(0.015f, 0.012f, 0.02f);
-            cam.fieldOfView = 48f;
+            cam.backgroundColor = new Color(0.008f, 0.006f, 0.01f);
+            cam.fieldOfView = 42f;
             cam.nearClipPlane = 0.05f;
+            cam.allowHDR = true;
             camGo.tag = "MainCamera";
             camGo.AddComponent<AudioListener>();
 
             var director = camGo.AddComponent<StageCameraDirector>();
             director.mainCam = cam;
-            director.lobbyOrbit = MakeMount(root, "Cam_LobbyOrbit", new Vector3(4.5f, 2.2f, -4.0f), new Vector3(0f, 1.3f, 1.0f));
-            director.hostPush = MakeMount(root, "Cam_HostPush", new Vector3(0.45f, 1.85f, 0.55f), new Vector3(0f, 1.7f, 2.5f));
-            director.miniWide = MakeMount(root, "Cam_MiniWide", new Vector3(0f, 5.0f, -9f), new Vector3(0f, 0.6f, 0f));
-            director.podium = MakeMount(root, "Cam_Podium", new Vector3(0f, 1.9f, -3.2f), new Vector3(0f, 1.3f, 0f));
-            director.babyLane = MakeMount(root, "Cam_BabyLane", new Vector3(0.2f, 2.0f, 2.8f), new Vector3(0f, 1.1f, 6.8f));
-            director.eyesCut = MakeMount(root, "Cam_Eyes", new Vector3(0f, 1.5f, -4.2f), new Vector3(0f, 1.3f, -6.0f));
+            director.lobbyOrbit = MakeMount(root, "Cam_LobbyOrbit", new Vector3(3.8f, 1.85f, -3.4f), new Vector3(0f, 1.35f, 1.2f));
+            // Hero Host desk push-in (sells sleazy doll + mic + desk in one glance)
+            director.hostPush = MakeMount(root, "Cam_HostPush", new Vector3(1.8f, 1.85f, -0.2f), new Vector3(0f, 1.65f, 2.75f));
+            director.miniWide = MakeMount(root, "Cam_MiniWide", new Vector3(0f, 4.8f, -9f), new Vector3(0f, 0.6f, 0f));
+            director.podium = MakeMount(root, "Cam_Podium", new Vector3(0f, 1.75f, -3.0f), new Vector3(0f, 1.25f, 0f));
+            // Hero baby lane — 3/4 plinth + lane pomp
+            director.babyLane = MakeMount(root, "Cam_BabyLane", new Vector3(2.6f, 2.15f, 7.4f), new Vector3(0f, 1.45f, 9.6f));
+            director.eyesCut = MakeMount(root, "Cam_Eyes", new Vector3(0f, 1.35f, -4.0f), new Vector3(0f, 1.2f, -6.2f));
             director.CutTo(director.lobbyOrbit);
 
             // UI — keep thin so 3D reads first
@@ -125,7 +129,7 @@ namespace Saury.Bootstrap
             var frame = new GameObject("VHSFrame");
             frame.transform.SetParent(canvas, false);
             var frameImg = frame.AddComponent<Image>();
-            frameImg.color = new Color(0.05f, 0.05f, 0.06f, 0.22f);
+            frameImg.color = new Color(0.04f, 0.03f, 0.04f, 0.28f);
             var frt = frame.GetComponent<RectTransform>();
             frt.anchorMin = Vector2.zero;
             frt.anchorMax = Vector2.one;
@@ -135,7 +139,7 @@ namespace Saury.Bootstrap
             var scan = new GameObject("Scanlines");
             scan.transform.SetParent(canvas, false);
             var scanImg = scan.AddComponent<Image>();
-            scanImg.color = new Color(0f, 0f, 0f, 0.1f);
+            scanImg.color = new Color(0f, 0f, 0f, 0.14f);
             var srt = scan.GetComponent<RectTransform>();
             srt.anchorMin = Vector2.zero;
             srt.anchorMax = Vector2.one;
@@ -145,7 +149,7 @@ namespace Saury.Bootstrap
             var noise = new GameObject("Noise");
             noise.transform.SetParent(canvas, false);
             var raw = noise.AddComponent<RawImage>();
-            raw.color = new Color(1f, 1f, 1f, 0.05f);
+            raw.color = new Color(1f, 1f, 1f, 0.07f);
             var nrt = noise.GetComponent<RectTransform>();
             nrt.anchorMin = Vector2.zero;
             nrt.anchorMax = Vector2.one;

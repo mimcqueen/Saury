@@ -25,14 +25,42 @@ namespace Saury.Minigames
             _arena.SetParent(parent, false);
             _arena.localPosition = new Vector3(22f, 0f, 0f);
 
-            // Yard
+            // Deadbeat backyard
             MeshKit.Part(_arena, "Yard", PrimitiveType.Cube,
                 new Vector3(0f, -0.05f, 0f), new Vector3(16f, 0.1f, 10f),
-                new Color(0.22f, 0.36f, 0.16f), collider: true, smoothness: 0.05f);
-            MeshKit.Part(_arena, "Fence", PrimitiveType.Cube,
-                new Vector3(0f, 0.7f, 4.6f), new Vector3(16f, 1.4f, 0.15f), SauryPalette.DirtyWood, collider: true);
-            MeshKit.Part(_arena, "TrailerHint", PrimitiveType.Cube,
-                new Vector3(-6f, 1.0f, -3.5f), new Vector3(3.5f, 2.0f, 2.2f), SauryPalette.DirtyPlastic);
+                SauryPalette.GrassDead, collider: true, smoothness: 0.05f);
+            // Chainlink-ish fence posts + rails
+            for (int i = 0; i < 9; i++)
+            {
+                MeshKit.Part(_arena, $"FencePost_{i}", PrimitiveType.Cylinder,
+                    new Vector3(-7f + i * 1.75f, 0.75f, 4.6f), new Vector3(0.08f, 0.75f, 0.08f),
+                    SauryPalette.Chainlink, metallic: 0.55f);
+            }
+            MeshKit.Part(_arena, "FenceRail", PrimitiveType.Cube,
+                new Vector3(0f, 1.2f, 4.6f), new Vector3(15f, 0.06f, 0.06f), SauryPalette.Chainlink, metallic: 0.5f);
+            MeshKit.Part(_arena, "FenceRailLo", PrimitiveType.Cube,
+                new Vector3(0f, 0.35f, 4.6f), new Vector3(15f, 0.06f, 0.06f), SauryPalette.Chainlink, metallic: 0.5f);
+            // Trailer
+            MeshKit.Part(_arena, "Trailer", PrimitiveType.Cube,
+                new Vector3(-6.2f, 1.1f, -3.6f), new Vector3(4.2f, 2.1f, 2.4f), SauryPalette.DirtyPlastic, smoothness: 0.2f);
+            MeshKit.Part(_arena, "TrailerStripe", PrimitiveType.Cube,
+                new Vector3(-6.2f, 1.5f, -2.35f), new Vector3(4.0f, 0.25f, 0.05f), SauryPalette.BruisedPurple, smoothness: 0.3f);
+            MeshKit.GlowPart(_arena, "TrailerWindow", PrimitiveType.Cube,
+                new Vector3(-5.2f, 1.6f, -2.35f), new Vector3(0.8f, 0.55f, 0.04f),
+                new Color(0.15f, 0.2f, 0.25f), SauryPalette.NeonAmber, 0.8f);
+            // Lawn junk
+            MeshKit.Part(_arena, "KiddiePool", PrimitiveType.Cylinder,
+                new Vector3(5.5f, 0.15f, -2.5f), new Vector3(1.8f, 0.15f, 1.8f), SauryPalette.NeonCyan, smoothness: 0.4f);
+            MeshKit.Part(_arena, "Tire", PrimitiveType.Cylinder,
+                new Vector3(4.2f, 0.25f, 1.5f), new Vector3(0.7f, 0.2f, 0.7f), SauryPalette.StageBlack, smoothness: 0.15f);
+            // Work light on yard
+            var yardSpot = new GameObject("YardSpot");
+            yardSpot.transform.SetParent(_arena, false);
+            yardSpot.transform.localPosition = new Vector3(0f, 4.5f, -1f);
+            yardSpot.transform.LookAt(_arena.TransformPoint(new Vector3(0f, 0.5f, 1f)));
+            var yl = yardSpot.AddComponent<Light>();
+            yl.type = LightType.Spot; yl.intensity = 4.5f; yl.range = 18f; yl.spotAngle = 55f;
+            yl.color = new Color(1f, 0.92f, 0.7f); yl.shadows = LightShadows.Soft;
 
             // Cans
             for (int i = 0; i < 5; i++)

@@ -4,8 +4,8 @@ using UnityEngine;
 namespace Saury.Bootstrap
 {
     /// <summary>
-    /// Simple 3D modeled characters from primitive mesh kits.
-    /// Readable as people/creatures — not sticker circles.
+    /// Art-directed doll kits — connected limbs, readable silhouettes, sleazy Maury energy.
+    /// Simple modeling, intentionally staged — not sterile greybox.
     /// </summary>
     public static class CharacterKit
     {
@@ -29,74 +29,94 @@ namespace Saury.Bootstrap
             root.transform.SetParent(parent, false);
             root.transform.position = worldPos;
 
-            // Hip / seated pelvis on chair
-            var hip = MeshKit.Part(root.transform, "Hip", PrimitiveType.Cube,
-                new Vector3(0f, 0.15f, 0.05f), new Vector3(0.55f, 0.22f, 0.4f), SauryPalette.HostSuit);
+            // Chair first (behind)
+            var chair = new GameObject("HostChair").transform;
+            chair.SetParent(parent, false);
+            chair.position = worldPos + new Vector3(0f, 0f, -0.4f);
+            MeshKit.Part(chair, "Seat", PrimitiveType.Cube,
+                new Vector3(0f, 0.38f, 0.05f), new Vector3(0.75f, 0.1f, 0.7f), SauryPalette.DirtyPlastic, smoothness: 0.15f);
+            MeshKit.Part(chair, "Back", PrimitiveType.Cube,
+                new Vector3(0f, 0.85f, -0.28f), new Vector3(0.75f, 0.85f, 0.1f), SauryPalette.DirtyPlastic, smoothness: 0.15f);
+            MeshKit.Part(chair, "Cushion", PrimitiveType.Cube,
+                new Vector3(0f, 0.95f, -0.22f), new Vector3(0.65f, 0.5f, 0.08f), SauryPalette.BruisedPurple, smoothness: 0.35f);
 
-            var torso = MeshKit.Part(root.transform, "Torso", PrimitiveType.Cube,
-                new Vector3(0f, 0.55f, 0.02f), new Vector3(0.62f, 0.7f, 0.35f), SauryPalette.HostSuit);
+            // Connected seated body
+            var hip = MeshKit.Part(root.transform, "Hip", PrimitiveType.Sphere,
+                new Vector3(0f, 0.42f, 0.02f), new Vector3(0.55f, 0.28f, 0.42f), SauryPalette.HostSuit, smoothness: 0.35f);
 
-            var shirt = MeshKit.Part(root.transform, "Shirt", PrimitiveType.Cube,
-                new Vector3(0f, 0.55f, 0.16f), new Vector3(0.45f, 0.45f, 0.08f), SauryPalette.HostShirt);
+            var torso = MeshKit.Part(root.transform, "Torso", PrimitiveType.Capsule,
+                new Vector3(0f, 0.78f, 0.02f), new Vector3(0.58f, 0.38f, 0.32f), SauryPalette.HostSuit, smoothness: 0.38f);
 
-            // Shoulders + arms (resting on desk)
-            MeshKit.Part(root.transform, "ShoulderL", PrimitiveType.Sphere,
-                new Vector3(-0.42f, 0.85f, 0f), Vector3.one * 0.18f, SauryPalette.HostSuit);
-            MeshKit.Part(root.transform, "ShoulderR", PrimitiveType.Sphere,
-                new Vector3(0.42f, 0.85f, 0f), Vector3.one * 0.18f, SauryPalette.HostSuit);
+            MeshKit.Part(root.transform, "Belly", PrimitiveType.Sphere,
+                new Vector3(0f, 0.62f, 0.12f), new Vector3(0.5f, 0.35f, 0.35f), SauryPalette.HostSuitShadow, smoothness: 0.4f);
 
-            MeshKit.PartRot(root.transform, "ArmL", PrimitiveType.Capsule,
-                new Vector3(-0.55f, 0.45f, 0.25f), new Vector3(20f, 0f, 25f),
-                new Vector3(0.14f, 0.32f, 0.14f), SauryPalette.HostSuit);
-            MeshKit.PartRot(root.transform, "ArmR", PrimitiveType.Capsule,
-                new Vector3(0.55f, 0.45f, 0.25f), new Vector3(20f, 0f, -25f),
-                new Vector3(0.14f, 0.32f, 0.14f), SauryPalette.HostSuit);
+            MeshKit.Part(root.transform, "Shirt", PrimitiveType.Cube,
+                new Vector3(0f, 0.8f, 0.18f), new Vector3(0.38f, 0.42f, 0.06f), SauryPalette.HostShirt, smoothness: 0.45f);
 
-            // Hands on desk
-            MeshKit.Part(root.transform, "HandL", PrimitiveType.Sphere,
-                new Vector3(-0.45f, 0.22f, 0.55f), Vector3.one * 0.14f, SauryPalette.SkinWarm);
-            MeshKit.Part(root.transform, "HandR", PrimitiveType.Sphere,
-                new Vector3(0.45f, 0.22f, 0.55f), Vector3.one * 0.14f, SauryPalette.SkinWarm);
+            MeshKit.Part(root.transform, "Tie", PrimitiveType.Cube,
+                new Vector3(0f, 0.72f, 0.22f), new Vector3(0.07f, 0.38f, 0.04f),
+                new Color(0.12f, 0.18f, 0.4f), smoothness: 0.5f);
+            MeshKit.GlowPart(root.transform, "TieClip", PrimitiveType.Cube,
+                new Vector3(0f, 0.62f, 0.24f), new Vector3(0.1f, 0.04f, 0.02f),
+                SauryPalette.NeonAmber, SauryPalette.NeonAmber, 0.8f);
 
-            // Neck + head
-            MeshKit.Part(root.transform, "Neck", PrimitiveType.Cylinder,
-                new Vector3(0f, 0.95f, 0f), new Vector3(0.14f, 0.08f, 0.14f), SauryPalette.SkinWarm);
+            // Shoulders → upper arm → forearm → hand (connected)
+            BuildArm(root.transform, -1);
+            BuildArm(root.transform, 1);
+
+            // Neck + head (sleazy doll)
+            MeshKit.Part(root.transform, "Neck", PrimitiveType.Sphere,
+                new Vector3(0f, 1.12f, 0.02f), new Vector3(0.18f, 0.16f, 0.18f), SauryPalette.SkinSweat, smoothness: 0.45f);
 
             var head = MeshKit.Part(root.transform, "Head", PrimitiveType.Sphere,
-                new Vector3(0f, 1.22f, 0.02f), new Vector3(0.42f, 0.48f, 0.4f), SauryPalette.SkinWarm);
+                new Vector3(0f, 1.38f, 0.04f), new Vector3(0.4f, 0.46f, 0.38f), SauryPalette.SkinSweat, smoothness: 0.42f);
 
-            // Hair / combover
-            MeshKit.Part(head.transform, "Hair", PrimitiveType.Sphere,
-                new Vector3(0.05f, 0.2f, -0.05f), new Vector3(0.95f, 0.55f, 0.9f),
-                new Color(0.25f, 0.18f, 0.12f));
+            // Bad combover
+            MeshKit.Part(head.transform, "HairDome", PrimitiveType.Sphere,
+                new Vector3(0.04f, 0.18f, -0.02f), new Vector3(0.92f, 0.55f, 0.88f), SauryPalette.Combover, smoothness: 0.2f);
+            MeshKit.Part(head.transform, "ComboverFlap", PrimitiveType.Sphere,
+                new Vector3(0.18f, 0.05f, 0.05f), new Vector3(0.45f, 0.25f, 0.5f), SauryPalette.Combover, smoothness: 0.2f);
 
-            // Eyes
-            BuildEyePair(head.transform, 0.12f, 0.08f, 0.2f);
+            // Face audience (−Z)
+            BuildFace(head.transform, 0.11f, 0.06f, -0.22f, big: false, irisTowardLocalZ: -1f);
 
-            // Nose
-            MeshKit.Part(head.transform, "Nose", PrimitiveType.Cube,
-                new Vector3(0f, -0.02f, 0.22f), new Vector3(0.08f, 0.1f, 0.12f), SauryPalette.SkinWarm);
+            MeshKit.Part(head.transform, "Nose", PrimitiveType.Sphere,
+                new Vector3(0f, -0.02f, -0.22f), new Vector3(0.12f, 0.14f, 0.16f), SauryPalette.SkinWarm, smoothness: 0.4f);
 
-            // Mouth flap (talk target)
             var mouth = MeshKit.Part(head.transform, "Mouth", PrimitiveType.Cube,
-                new Vector3(0f, -0.14f, 0.2f), new Vector3(0.2f, 0.06f, 0.06f),
-                new Color(0.45f, 0.12f, 0.15f));
+                new Vector3(0f, -0.14f, -0.2f), new Vector3(0.18f, 0.05f, 0.06f),
+                new Color(0.5f, 0.15f, 0.18f), smoothness: 0.35f);
 
-            // Tie
-            MeshKit.Part(root.transform, "Tie", PrimitiveType.Cube,
-                new Vector3(0f, 0.5f, 0.2f), new Vector3(0.08f, 0.35f, 0.04f),
-                new Color(0.15f, 0.2f, 0.45f));
-
-            // Chair behind host
-            var chair = new GameObject("HostChair");
-            chair.transform.SetParent(parent, false);
-            chair.transform.position = worldPos + new Vector3(0f, 0f, -0.35f);
-            MeshKit.Part(chair.transform, "Seat", PrimitiveType.Cube,
-                new Vector3(0f, 0.35f, 0f), new Vector3(0.7f, 0.08f, 0.7f), SauryPalette.DirtyPlastic);
-            MeshKit.Part(chair.transform, "Back", PrimitiveType.Cube,
-                new Vector3(0f, 0.75f, -0.3f), new Vector3(0.7f, 0.7f, 0.08f), SauryPalette.DirtyPlastic);
+            // Sweaty brow shine
+            MeshKit.GlowPart(head.transform, "BrowShine", PrimitiveType.Sphere,
+                new Vector3(0f, 0.12f, -0.18f), new Vector3(0.25f, 0.08f, 0.1f),
+                SauryPalette.SkinSweat, Color.white, 0.35f);
 
             return new HostBuild { root = root, mouth = mouth.transform, head = head.transform, torso = torso.transform };
+        }
+
+        static void BuildArm(Transform root, int side)
+        {
+            float s = side;
+            var shoulder = MeshKit.Part(root, side < 0 ? "ShoulderL" : "ShoulderR", PrimitiveType.Sphere,
+                new Vector3(s * 0.38f, 1.05f, 0f), Vector3.one * 0.2f, SauryPalette.HostSuit, smoothness: 0.38f);
+
+            // Upper arm toward desk (audience / -Z)
+            var upper = MeshKit.LimbChain(root, side < 0 ? "UpperArmL" : "UpperArmR",
+                new Vector3(s * 0.42f, 1.0f, -0.08f),
+                new Vector3(-25f, 0f, s * 28f),
+                0.38f, 0.07f, SauryPalette.HostSuit);
+
+            // Forearm resting forward on desk top
+            var fore = MeshKit.LimbChain(root, side < 0 ? "ForeArmL" : "ForeArmR",
+                new Vector3(s * 0.5f, 0.62f, -0.42f),
+                new Vector3(-55f, 0f, s * 8f),
+                0.34f, 0.065f, SauryPalette.HostSuit);
+
+            MeshKit.Part(root, side < 0 ? "HandL" : "HandR", PrimitiveType.Sphere,
+                new Vector3(s * 0.48f, 0.38f, -0.7f), Vector3.one * 0.13f, SauryPalette.SkinWarm, smoothness: 0.4f);
+
+            _ = shoulder; _ = upper; _ = fore;
         }
 
         public static DadBuild BuildDad(Transform parent, Vector3 localPos, CreatureId creature, Color? overrideColor = null, string name = "Dad")
@@ -105,122 +125,141 @@ namespace Saury.Bootstrap
             root.transform.SetParent(parent, false);
             root.transform.localPosition = localPos;
 
-            // Physics capsule (invisible-ish collider body) — visual is child
             var bodyCol = root.AddComponent<CapsuleCollider>();
-            bodyCol.height = 1.8f;
-            bodyCol.radius = 0.35f;
-            bodyCol.center = new Vector3(0f, 0.9f, 0f);
+            bodyCol.height = 1.85f;
+            bodyCol.radius = 0.38f;
+            bodyCol.center = new Vector3(0f, 0.92f, 0f);
 
             var visual = new GameObject("Visual").transform;
             visual.SetParent(root.transform, false);
 
             Color body = overrideColor ?? SauryPalette.CreatureBody(creature);
-            Color accent = Color.Lerp(body, Color.black, 0.25f);
+            Color accent = SauryPalette.CreatureAccent(creature);
+            Color limb = Color.Lerp(body, Color.black, 0.12f);
 
-            // Legs
-            MeshKit.Part(visual, "LegL", PrimitiveType.Capsule,
-                new Vector3(-0.15f, 0.4f, 0f), new Vector3(0.22f, 0.4f, 0.22f), accent);
-            MeshKit.Part(visual, "LegR", PrimitiveType.Capsule,
-                new Vector3(0.15f, 0.4f, 0f), new Vector3(0.22f, 0.4f, 0.22f), accent);
+            // Pelvis
+            MeshKit.Part(visual, "Pelvis", PrimitiveType.Sphere,
+                new Vector3(0f, 0.72f, 0f), new Vector3(0.45f, 0.28f, 0.32f), limb, smoothness: 0.3f);
 
-            // Torso shape varies by creature
+            // Legs — connected chains
+            MeshKit.LimbChain(visual, "ThighL", new Vector3(-0.14f, 0.7f, 0f), new Vector3(8f, 0f, 8f), 0.42f, 0.09f, limb);
+            MeshKit.LimbChain(visual, "ThighR", new Vector3(0.14f, 0.7f, 0f), new Vector3(8f, 0f, -8f), 0.42f, 0.09f, limb);
+            MeshKit.Part(visual, "FootL", PrimitiveType.Sphere,
+                new Vector3(-0.16f, 0.08f, 0.06f), new Vector3(0.18f, 0.1f, 0.26f), accent, smoothness: 0.25f);
+            MeshKit.Part(visual, "FootR", PrimitiveType.Sphere,
+                new Vector3(0.16f, 0.08f, 0.06f), new Vector3(0.18f, 0.1f, 0.26f), accent, smoothness: 0.25f);
+
+            // Torso by creature
+            GameObject torso;
             switch (creature)
             {
                 case CreatureId.Blob:
-                    MeshKit.Part(visual, "Torso", PrimitiveType.Sphere,
-                        new Vector3(0f, 0.95f, 0f), new Vector3(0.95f, 0.85f, 0.8f), body);
+                    torso = MeshKit.Part(visual, "Torso", PrimitiveType.Sphere,
+                        new Vector3(0f, 1.05f, 0f), new Vector3(0.95f, 0.8f, 0.75f), body, smoothness: 0.55f);
                     break;
                 case CreatureId.Cryptid:
-                    MeshKit.Part(visual, "Torso", PrimitiveType.Cube,
-                        new Vector3(0f, 1.05f, 0f), new Vector3(0.55f, 0.9f, 0.35f), body);
+                    torso = MeshKit.Part(visual, "Torso", PrimitiveType.Capsule,
+                        new Vector3(0f, 1.15f, 0f), new Vector3(0.42f, 0.5f, 0.32f), body, smoothness: 0.25f);
                     break;
                 default:
-                    MeshKit.Part(visual, "Torso", PrimitiveType.Capsule,
-                        new Vector3(0f, 1.0f, 0f), new Vector3(0.55f, 0.45f, 0.35f), body);
+                    torso = MeshKit.Part(visual, "Torso", PrimitiveType.Capsule,
+                        new Vector3(0f, 1.1f, 0f), new Vector3(0.5f, 0.42f, 0.34f), body, smoothness: 0.32f);
                     break;
             }
 
-            // Arms
-            MeshKit.PartRot(visual, "ArmL", PrimitiveType.Capsule,
-                new Vector3(-0.42f, 1.05f, 0f), new Vector3(0f, 0f, 15f),
-                new Vector3(0.16f, 0.35f, 0.16f), body);
-            MeshKit.PartRot(visual, "ArmR", PrimitiveType.Capsule,
-                new Vector3(0.42f, 1.05f, 0f), new Vector3(0f, 0f, -15f),
-                new Vector3(0.16f, 0.35f, 0.16f), body);
+            // Arms connected
+            MeshKit.LimbChain(visual, "ArmL", new Vector3(-0.32f, 1.35f, 0f), new Vector3(15f, 0f, 35f), 0.4f, 0.075f, limb);
+            MeshKit.LimbChain(visual, "ArmR", new Vector3(0.32f, 1.35f, 0f), new Vector3(15f, 0f, -35f), 0.4f, 0.075f, limb);
+            MeshKit.Part(visual, "HandL", PrimitiveType.Sphere,
+                new Vector3(-0.55f, 0.95f, 0.1f), Vector3.one * 0.14f, body, smoothness: 0.35f);
+            MeshKit.Part(visual, "HandR", PrimitiveType.Sphere,
+                new Vector3(0.55f, 0.95f, 0.1f), Vector3.one * 0.14f, body, smoothness: 0.35f);
 
             // Head
             Vector3 headScale = creature switch
             {
-                CreatureId.Goblin => new Vector3(0.5f, 0.45f, 0.5f),
-                CreatureId.Imp => new Vector3(0.4f, 0.45f, 0.4f),
-                CreatureId.Catgirl => new Vector3(0.42f, 0.42f, 0.4f),
-                CreatureId.Cryptid => new Vector3(0.35f, 0.55f, 0.4f),
-                CreatureId.Blob => new Vector3(0.55f, 0.45f, 0.55f),
-                _ => new Vector3(0.42f, 0.45f, 0.42f)
+                CreatureId.Goblin => new Vector3(0.48f, 0.42f, 0.48f),
+                CreatureId.Imp => new Vector3(0.38f, 0.42f, 0.38f),
+                CreatureId.Catgirl => new Vector3(0.4f, 0.4f, 0.38f),
+                CreatureId.Cryptid => new Vector3(0.34f, 0.52f, 0.38f),
+                CreatureId.Blob => new Vector3(0.55f, 0.42f, 0.55f),
+                _ => new Vector3(0.4f, 0.44f, 0.4f)
             };
+            MeshKit.Part(visual, "Neck", PrimitiveType.Sphere,
+                new Vector3(0f, 1.42f, 0f), new Vector3(0.16f, 0.12f, 0.16f), body, smoothness: 0.35f);
             var head = MeshKit.Part(visual, "Head", PrimitiveType.Sphere,
-                new Vector3(0f, 1.55f, 0.02f), headScale, body);
+                new Vector3(0f, 1.62f, 0.02f), headScale, body, smoothness: 0.38f);
 
-            BuildEyePair(head.transform, 0.15f, 0.1f, 0.22f);
+            BuildFace(head.transform, 0.13f, 0.08f, 0.22f, big: creature == CreatureId.Goblin || creature == CreatureId.Blob);
 
-            // Creature extras
-            switch (creature)
-            {
-                case CreatureId.Goblin:
-                    MeshKit.Part(head.transform, "EarL", PrimitiveType.Sphere,
-                        new Vector3(-0.55f, 0.15f, 0f), new Vector3(0.35f, 0.55f, 0.2f), body);
-                    MeshKit.Part(head.transform, "EarR", PrimitiveType.Sphere,
-                        new Vector3(0.55f, 0.15f, 0f), new Vector3(0.35f, 0.55f, 0.2f), body);
-                    MeshKit.Part(head.transform, "Nose", PrimitiveType.Sphere,
-                        new Vector3(0f, -0.05f, 0.45f), Vector3.one * 0.25f, accent);
-                    break;
-                case CreatureId.Catgirl:
-                    MeshKit.PartRot(head.transform, "EarL", PrimitiveType.Cube,
-                        new Vector3(-0.28f, 0.55f, 0f), new Vector3(0f, 0f, -20f),
-                        new Vector3(0.18f, 0.35f, 0.1f), body);
-                    MeshKit.PartRot(head.transform, "EarR", PrimitiveType.Cube,
-                        new Vector3(0.28f, 0.55f, 0f), new Vector3(0f, 0f, 20f),
-                        new Vector3(0.18f, 0.35f, 0.1f), body);
-                    MeshKit.Part(visual, "Tail", PrimitiveType.Capsule,
-                        new Vector3(0f, 0.7f, -0.35f), new Vector3(0.12f, 0.4f, 0.12f), accent);
-                    break;
-                case CreatureId.Cryptid:
-                    MeshKit.Part(head.transform, "AntlerL", PrimitiveType.Cylinder,
-                        new Vector3(-0.2f, 0.7f, -0.1f), new Vector3(0.06f, 0.35f, 0.06f), SauryPalette.DirtyPlastic);
-                    MeshKit.Part(head.transform, "AntlerR", PrimitiveType.Cylinder,
-                        new Vector3(0.2f, 0.7f, -0.1f), new Vector3(0.06f, 0.35f, 0.06f), SauryPalette.DirtyPlastic);
-                    break;
-                case CreatureId.Imp:
-                    MeshKit.PartRot(head.transform, "HornL", PrimitiveType.Cylinder,
-                        new Vector3(-0.2f, 0.55f, 0f), new Vector3(20f, 0f, -25f),
-                        new Vector3(0.08f, 0.22f, 0.08f), new Color(0.9f, 0.85f, 0.7f));
-                    MeshKit.PartRot(head.transform, "HornR", PrimitiveType.Cylinder,
-                        new Vector3(0.2f, 0.55f, 0f), new Vector3(20f, 0f, 25f),
-                        new Vector3(0.08f, 0.22f, 0.08f), new Color(0.9f, 0.85f, 0.7f));
-                    break;
-                case CreatureId.Human:
-                    MeshKit.Part(head.transform, "Mullet", PrimitiveType.Sphere,
-                        new Vector3(0f, 0.05f, -0.35f), new Vector3(0.7f, 0.5f, 0.55f),
-                        new Color(0.2f, 0.15f, 0.1f));
-                    MeshKit.Part(head.transform, "Hat", PrimitiveType.Cylinder,
-                        new Vector3(0f, 0.45f, 0f), new Vector3(0.55f, 0.08f, 0.55f),
-                        new Color(0.55f, 0.15f, 0.12f));
-                    break;
-                case CreatureId.Blob:
-                    MeshKit.Part(head.transform, "BlobDrool", PrimitiveType.Sphere,
-                        new Vector3(0.15f, -0.35f, 0.25f), Vector3.one * 0.2f, Color.Lerp(body, Color.white, 0.3f));
-                    break;
-            }
+            ApplyCreatureExtras(visual, head.transform, creature, body, accent);
 
-            // Trucker hat prop for all (deadbeat read)
+            // Shared deadbeat cap (except human who has mullet+hat)
             if (creature != CreatureId.Human)
             {
                 MeshKit.Part(head.transform, "Cap", PrimitiveType.Cylinder,
-                    new Vector3(0f, 0.4f, 0.05f), new Vector3(0.5f, 0.07f, 0.5f),
-                    new Color(0.5f, 0.15f, 0.12f));
+                    new Vector3(0f, 0.38f, 0.04f), new Vector3(0.48f, 0.07f, 0.48f), accent, smoothness: 0.3f);
+                MeshKit.Part(head.transform, "Brim", PrimitiveType.Cube,
+                    new Vector3(0f, 0.32f, 0.22f), new Vector3(0.42f, 0.03f, 0.22f), accent, smoothness: 0.3f);
             }
 
+            _ = torso;
             return new DadBuild { root = root, visual = visual };
+        }
+
+        static void ApplyCreatureExtras(Transform visual, Transform head, CreatureId creature, Color body, Color accent)
+        {
+            switch (creature)
+            {
+                case CreatureId.Human:
+                    MeshKit.Part(head, "Mullet", PrimitiveType.Sphere,
+                        new Vector3(0f, 0.0f, -0.32f), new Vector3(0.65f, 0.45f, 0.5f), SauryPalette.Combover, smoothness: 0.2f);
+                    MeshKit.Part(head, "Hat", PrimitiveType.Cylinder,
+                        new Vector3(0f, 0.42f, 0f), new Vector3(0.52f, 0.08f, 0.52f), accent, smoothness: 0.28f);
+                    MeshKit.Part(head, "Brim", PrimitiveType.Cube,
+                        new Vector3(0f, 0.36f, 0.24f), new Vector3(0.45f, 0.03f, 0.24f), accent, smoothness: 0.28f);
+                    break;
+                case CreatureId.Goblin:
+                    MeshKit.Part(head, "EarL", PrimitiveType.Sphere,
+                        new Vector3(-0.52f, 0.12f, 0f), new Vector3(0.28f, 0.55f, 0.18f), body, smoothness: 0.35f);
+                    MeshKit.Part(head, "EarR", PrimitiveType.Sphere,
+                        new Vector3(0.52f, 0.12f, 0f), new Vector3(0.28f, 0.55f, 0.18f), body, smoothness: 0.35f);
+                    MeshKit.Part(head, "Nose", PrimitiveType.Sphere,
+                        new Vector3(0f, -0.05f, 0.42f), Vector3.one * 0.22f, accent, smoothness: 0.4f);
+                    break;
+                case CreatureId.Catgirl:
+                    MeshKit.PartRot(head, "EarL", PrimitiveType.Sphere,
+                        new Vector3(-0.22f, 0.48f, 0f), new Vector3(0f, 0f, -18f),
+                        new Vector3(0.16f, 0.32f, 0.12f), body);
+                    MeshKit.PartRot(head, "EarR", PrimitiveType.Sphere,
+                        new Vector3(0.22f, 0.48f, 0f), new Vector3(0f, 0f, 18f),
+                        new Vector3(0.16f, 0.32f, 0.12f), body);
+                    var tail = MeshKit.LimbChain(visual, "Tail", new Vector3(0f, 0.85f, -0.25f),
+                        new Vector3(50f, 0f, 0f), 0.55f, 0.06f, accent);
+                    _ = tail;
+                    break;
+                case CreatureId.Cryptid:
+                    MeshKit.PartRot(head, "AntlerL", PrimitiveType.Capsule,
+                        new Vector3(-0.18f, 0.55f, -0.08f), new Vector3(15f, 0f, -20f),
+                        new Vector3(0.06f, 0.28f, 0.06f), SauryPalette.DirtyPlastic);
+                    MeshKit.PartRot(head, "AntlerR", PrimitiveType.Capsule,
+                        new Vector3(0.18f, 0.55f, -0.08f), new Vector3(15f, 0f, 20f),
+                        new Vector3(0.06f, 0.28f, 0.06f), SauryPalette.DirtyPlastic);
+                    break;
+                case CreatureId.Imp:
+                    MeshKit.PartRot(head, "HornL", PrimitiveType.Capsule,
+                        new Vector3(-0.16f, 0.48f, 0f), new Vector3(25f, 0f, -30f),
+                        new Vector3(0.07f, 0.2f, 0.07f), accent);
+                    MeshKit.PartRot(head, "HornR", PrimitiveType.Capsule,
+                        new Vector3(0.16f, 0.48f, 0f), new Vector3(25f, 0f, 30f),
+                        new Vector3(0.07f, 0.2f, 0.07f), accent);
+                    break;
+                case CreatureId.Blob:
+                    MeshKit.Part(head, "Drool", PrimitiveType.Sphere,
+                        new Vector3(0.12f, -0.32f, 0.22f), Vector3.one * 0.18f,
+                        Color.Lerp(body, Color.white, 0.35f), smoothness: 0.7f);
+                    break;
+            }
         }
 
         public static GameObject BuildBaby(Transform parent, Color primary, Color accent, float earScale, float headSquash)
@@ -228,53 +267,50 @@ namespace Saury.Bootstrap
             var root = new GameObject("MockBabyMesh");
             root.transform.SetParent(parent, false);
 
+            MeshKit.Part(root.transform, "Pelvis", PrimitiveType.Sphere,
+                new Vector3(0f, -0.35f, 0f), new Vector3(0.45f, 0.28f, 0.4f),
+                Color.Lerp(primary, Color.white, 0.15f), smoothness: 0.45f);
+
             var head = MeshKit.Part(root.transform, "Head", PrimitiveType.Sphere,
-                new Vector3(0f, 0.15f, 0f), new Vector3(0.7f, 0.7f * headSquash, 0.7f), primary);
-            BuildEyePair(head.transform, 0.18f, 0.12f, 0.28f, big: true);
+                new Vector3(0f, 0.2f, 0f), new Vector3(0.72f, 0.72f * headSquash, 0.72f), primary, smoothness: 0.48f);
+            BuildFace(head.transform, 0.16f, 0.1f, 0.28f, big: true);
 
             MeshKit.Part(head.transform, "EarL", PrimitiveType.Sphere,
-                new Vector3(-0.55f, 0.05f, 0f), Vector3.one * (0.32f * earScale), accent);
+                new Vector3(-0.5f, 0.05f, 0f), Vector3.one * (0.3f * earScale), accent, smoothness: 0.4f);
             MeshKit.Part(head.transform, "EarR", PrimitiveType.Sphere,
-                new Vector3(0.55f, 0.05f, 0f), Vector3.one * (0.32f * earScale), accent);
+                new Vector3(0.5f, 0.05f, 0f), Vector3.one * (0.3f * earScale), accent, smoothness: 0.4f);
 
-            MeshKit.Part(root.transform, "Body", PrimitiveType.Capsule,
-                new Vector3(0f, -0.45f, 0f), new Vector3(0.55f, 0.32f, 0.45f),
-                Color.Lerp(primary, Color.white, 0.2f));
+            MeshKit.LimbChain(root.transform, "ArmL", new Vector3(-0.35f, -0.05f, 0f), new Vector3(0f, 0f, 50f), 0.28f, 0.06f, primary);
+            MeshKit.LimbChain(root.transform, "ArmR", new Vector3(0.35f, -0.05f, 0f), new Vector3(0f, 0f, -50f), 0.28f, 0.06f, primary);
 
-            // Onesie feet
             MeshKit.Part(root.transform, "FootL", PrimitiveType.Sphere,
-                new Vector3(-0.18f, -0.75f, 0.05f), Vector3.one * 0.22f, accent);
+                new Vector3(-0.16f, -0.7f, 0.05f), Vector3.one * 0.2f, accent, smoothness: 0.4f);
             MeshKit.Part(root.transform, "FootR", PrimitiveType.Sphere,
-                new Vector3(0.18f, -0.75f, 0.05f), Vector3.one * 0.22f, accent);
+                new Vector3(0.16f, -0.7f, 0.05f), Vector3.one * 0.2f, accent, smoothness: 0.4f);
 
-            // Tiny trucker hat
             MeshKit.Part(head.transform, "HatBrim", PrimitiveType.Cylinder,
-                new Vector3(0f, 0.4f, 0.05f), new Vector3(0.55f, 0.05f, 0.55f), accent);
+                new Vector3(0f, 0.42f, 0.05f), new Vector3(0.55f, 0.05f, 0.55f), accent, smoothness: 0.35f);
             MeshKit.Part(head.transform, "HatTop", PrimitiveType.Sphere,
-                new Vector3(0f, 0.5f, 0f), new Vector3(0.4f, 0.25f, 0.4f), accent);
-
-            // Arm stubs for animatronic wave read
-            MeshKit.PartRot(root.transform, "ArmL", PrimitiveType.Capsule,
-                new Vector3(-0.4f, -0.25f, 0f), new Vector3(0f, 0f, 40f),
-                new Vector3(0.12f, 0.2f, 0.12f), primary);
-            MeshKit.PartRot(root.transform, "ArmR", PrimitiveType.Capsule,
-                new Vector3(0.4f, -0.25f, 0f), new Vector3(0f, 0f, -40f),
-                new Vector3(0.12f, 0.2f, 0.12f), primary);
+                new Vector3(0f, 0.52f, 0f), new Vector3(0.38f, 0.22f, 0.38f), accent, smoothness: 0.35f);
 
             return root;
         }
 
-        static void BuildEyePair(Transform head, float x, float y, float z, bool big = false)
+        static void BuildFace(Transform head, float x, float y, float z, bool big, float irisTowardLocalZ = 1f)
         {
-            float s = big ? 0.28f : 0.2f;
-            float pupil = big ? 0.12f : 0.09f;
+            float s = big ? 0.26f : 0.18f;
+            float pupil = big ? 0.11f : 0.08f;
+            float iz = Mathf.Sign(irisTowardLocalZ);
             for (int i = 0; i < 2; i++)
             {
                 float side = i == 0 ? -1f : 1f;
                 var white = MeshKit.Part(head, $"EyeWhite_{i}", PrimitiveType.Sphere,
-                    new Vector3(side * x, y, z), Vector3.one * s, SauryPalette.EyeWhite, smoothness: 0.55f);
-                MeshKit.Part(white.transform, "Pupil", PrimitiveType.Sphere,
-                    new Vector3(0f, 0f, 0.35f), Vector3.one * (pupil / s), SauryPalette.EyeIris, smoothness: 0.4f);
+                    new Vector3(side * x, y, z), Vector3.one * s, SauryPalette.EyeWhite, smoothness: 0.65f);
+                MeshKit.Part(white.transform, "Iris", PrimitiveType.Sphere,
+                    new Vector3(0f, 0f, iz * 0.32f), Vector3.one * (pupil / s), SauryPalette.EyeIris, smoothness: 0.45f);
+                MeshKit.GlowPart(white.transform, "Catch", PrimitiveType.Sphere,
+                    new Vector3(0.12f, 0.12f, iz * 0.45f), Vector3.one * 0.15f,
+                    Color.white, new Color(1f, 0.95f, 0.8f), 1.4f);
             }
         }
     }
