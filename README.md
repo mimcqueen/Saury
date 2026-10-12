@@ -18,16 +18,17 @@ Unity project folder: [`SauryUnity/`](SauryUnity/)
 
 ## Quick start
 
-Full guide: Project store `docs/how-to-run-unity.md` (also mirrored intent in `SauryUnity/README.md`).
+See [`SauryUnity/README.md`](SauryUnity/README.md). Project vision for local agents: [`docs/project-context.md`](docs/project-context.md) · [`AGENTS.md`](AGENTS.md).
 
 ### On your machine
 
-1. Install **Unity Hub** + Editor **6000.3.26f1** (or any Unity 6 LTS close to it).
-2. Hub → **Open** → select the `SauryUnity` folder.
-3. Open scene `Assets/Scenes/Bootstrap.unity`.
-4. Press **Play**.
+1. `git pull` this repo.
+2. Install **Unity Hub** + Editor **6000.3.26f1** (or any Unity 6 LTS close to it).
+3. Hub → **Open** → select the `SauryUnity` folder.
+4. Open scene `Assets/Scenes/Bootstrap.unity`.
+5. Press **Play** (Demo Mode HUD on by default; **F3** = debug panel).
 
-Flow auto-runs: **Lobby → Make Dad → Mini 1 → Baby showcase → Mini 2 → Baby showcase → Crown**.
+Flow: **Lobby → Make Dad → Pissing Contest → Baby → BBQ Brawl → Baby → Crown**.
 
 ## Controls (same-PC stub)
 
